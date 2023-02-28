@@ -15,10 +15,13 @@ return new class extends Migration
     {
         Schema::create('user_items', function (Blueprint $table) {
             $table->id();
-            $table->foreign('user_collection_id')->references('id')->on('user_collections')->onDelete('cascade');
-            $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
+            $table->unsignedBigInteger('user_collection_id');
+            $table->unsignedBigInteger('item_id');
             $table->unsignedSmallInteger('counter');
             $table->timestamps();
+            $table->foreign('user_collection_id')->references('id')->on('user_collections')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
+
         });
     }
 

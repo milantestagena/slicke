@@ -15,12 +15,13 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');
+            $table->unsignedBigInteger('collection_id');
             $table->string('identifier', 32);
             $table->string('description', 256);
             $table->string('link', 128);
             $table->string('title', 64);
             $table->timestamps();
+            $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');
         });
     }
 

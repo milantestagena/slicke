@@ -15,10 +15,12 @@ return new class extends Migration
     {
         Schema::create('membership_price_per_countries', function (Blueprint $table) {
             $table->id();
-            $table->foreign('membership_id')->references('id')->on('memberships')->onDelete('cascade');
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
+            $table->unsignedBigInteger('membership_id');
+            $table->unsignedBigInteger('country_id');
             $table->float('price');
             $table->timestamps();
+            $table->foreign('membership_id')->references('id')->on('memberships')->onDelete('cascade');
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
         });
     }
 

@@ -15,10 +15,13 @@ return new class extends Migration
     {
         Schema::create('proposal_items', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('proposal_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('item_id');
+            $table->timestamps();
             $table->foreign('proposal_id')->references('id')->on('proposals')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 
