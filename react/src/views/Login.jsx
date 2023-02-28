@@ -19,13 +19,14 @@ export default function Login() {
     }
     axiosClient.post('/login', payload)
       .then(({data}) => {
-        setUser(data.user)
-        setToken(data.token);
+        console.log(data);
+        setUser(data.data.user)
+        setToken(data.data.token);
       })
       .catch((err) => {
         const response = err.response;
-        if (response && response.status === 422) {
-          setMessage(response.data.message)
+        if (err && err.status === 422) {
+          setMessage(err.message)
         }
       })
   }
