@@ -16,6 +16,7 @@ class Collection extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'type',
         'name',
         'description',
         'year',

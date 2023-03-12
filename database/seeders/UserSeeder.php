@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Conversation;
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
-class ConversationSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,6 +14,6 @@ class ConversationSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Conversation::factory(2000)->create();
+        \App\Models\User::factory(1000)->create();
     }
 }

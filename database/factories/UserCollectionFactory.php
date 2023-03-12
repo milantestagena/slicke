@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Collection;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,8 @@ class UserCollectionFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'user_id' => fake()->randomElement(User::pluck('id')),
+            'collection_id' => fake()->randomElement(Collection::pluck('id'))
         ];
     }
 }

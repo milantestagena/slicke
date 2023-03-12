@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +18,14 @@ class ItemFactory extends Factory
      */
     public function definition()
     {
+        $collectionId = Collection::first()->id;
         return [
             //
+            'collection_id' => $collectionId,
+            'identifier' => fake()->numerify(),
+            'description' => Str::random(256),
+            'link' => Str::random(128),
+            'title' => Str::random(64),
         ];
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Item;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ItemSeeder extends Seeder
 {
@@ -15,5 +16,10 @@ class ItemSeeder extends Seeder
     public function run()
     {
         //
+        for($i=1; $i<=125; $i++){
+            Item::factory()->create([
+                'identifier' => $i,
+            ]);
+        }
     }
 }
