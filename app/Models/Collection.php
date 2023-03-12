@@ -44,4 +44,8 @@ class Collection extends Model
     {
         return $this->hasMany(Item::class, 'collection_id');
     }
+
+    public static function getCollectionsForUser(User $user){
+        return Collection::where('user_id', $user->id)->get();
+    }
 }

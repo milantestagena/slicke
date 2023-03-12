@@ -3,11 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Models\Collection;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -71,6 +72,11 @@ class User extends Authenticatable
 
     public function collections(): HasMany
     {
-        return $this->hasMany(Collection::class, 'collection_id');
+        return $this->hasMany(UserCollection::class, 'user_id');
+    }
+
+    public function getCollection(Collection $collection): HasMany
+    {
+        return $this->hasOne(UserCollection::class, 'user_id')->where('collection_id', $collection->id)->first();
     }
 }
