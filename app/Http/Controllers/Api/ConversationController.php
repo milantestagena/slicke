@@ -39,10 +39,9 @@ class ConversationController extends Controller
     public function sendMessage(int $to,  StoreConversationRequest $request)
     {
         $user = Auth::user();
-        $to = $request->query('to');
         $message = new Conversation;
-        $message->from = $user->id;
-        $message->to = $to;
+        $message->sender_id = $user->id;
+        $message->receiver_id = $to;
         $message->message = $request->input('message');
 
         try {
@@ -50,7 +49,7 @@ class ConversationController extends Controller
             return $this->success('Message sent');
         } catch (\Throwable $th) {
             //throw $th;
-            return $this->error('Message not sent', 400);
+            return $this->error('Message not sent', 400, $th);
         }
 
     }

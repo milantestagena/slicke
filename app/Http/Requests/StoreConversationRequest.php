@@ -25,7 +25,7 @@ class StoreConversationRequest extends FormRequest
     {
         return [
             //
-            'message' => 'required|text'
+            'message' => 'required|string'
         ];
     }
 }
