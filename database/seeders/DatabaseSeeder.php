@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             MembershipSeeder::class,
+            CountriesSeeder::class,
             UserSeeder::class,
             ConversationSeeder::class,
             CollectionSeeder::class,

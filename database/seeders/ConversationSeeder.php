@@ -15,6 +15,6 @@ class ConversationSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Conversation::factory(2000)->create();
+        Conversation::factory(2000)->create();
     }
 }

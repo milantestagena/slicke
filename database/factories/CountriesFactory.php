@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class CountriesFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'country' => Str::random(64),
+            'region' => Str::random(64),
+            'active' => false,
+
         ];
     }
 }
