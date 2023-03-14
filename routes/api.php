@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ConversationController::class)->group(function () {
         Route::get('/conversations', 'getConversations');
         Route::get('/conversation/{with}', 'getConversation');
+        Route::post('/send_message/{to}', 'sendMessage');
     });
     Route::controller(CollectionController::class)->group(function () {
         Route::get('/collections', 'getCollectionsForUser');

@@ -62,19 +62,20 @@ class Conversation extends Model
           ));
         return $results;
     }
-    public static function getConversation(User $user, User $corespondend){
+    public static function getConversation(User $user, int $corespondend){
         return Model::where(
             function($query) use ($user, $corespondend){
-                $query->where(function($query) use ($user,$corespondend){
+                $query->where(function($query) use ($user, $corespondend){
                     $query->where('sender_id', $user->id);
-                    $query->where('receiver_id', $corespondend->id);
+                    $query->where('receiver_id', $corespondend);
                 });
-                $query->orWhere(function($query) use ($user,$corespondend){
-                    $query->where('sender_id', $corespondend->id);
+                $query->orWhere(function($query) use ($user, $corespondend){
+                    $query->where('sender_id', $corespondend);
                     $query->where('receiver_id', $user->id);
                 });
             }
         )->orderBy('created_at', 'asc')->get();
 
     }
+
 }

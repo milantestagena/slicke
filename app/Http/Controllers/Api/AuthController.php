@@ -35,7 +35,7 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
-            return $this->error('', 'Provided email or password is incorrect', 422);
+            return $this->error('Provided email or password is incorrect', 422);
         }
 
         /** @var \App\Models\User $user */

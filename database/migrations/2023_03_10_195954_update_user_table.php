@@ -15,12 +15,13 @@ return new class extends Migration
     {
         //
         Schema::table('users', function (Blueprint $table) {
-            $table->string('fullname', 128)->nullable(false)->default(null);
-            $table->string('mailing_address_street', 64)->nullable(false)->default(null);
-            $table->string('mailing_address_number', 8)->nullable(false)->default(null);
-            $table->string('mailing_address_postal', 16)->nullable(false)->default(null);
-            $table->float('latitute')->nullable(false)->default(null);
-            $table->float('longitude')->nullable(false)->default(null);
+            $table->string('phone_number', 32)->nullable(true)->default(null);
+            $table->string('fullname', 128)->nullable(true)->default(null);
+            $table->string('mailing_address_street', 64)->nullable(true)->default(null);
+            $table->string('mailing_address_number', 8)->nullable(true)->default(null);
+            $table->string('mailing_address_postal', 16)->nullable(true)->default(null);
+            $table->float('latitute')->nullable(true)->default(null);
+            $table->float('longitude')->nullable(true)->default(null);
             $table->unsignedBigInteger('country_id');
             $table->unsignedBigInteger('membership_id');
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
@@ -36,6 +37,7 @@ return new class extends Migration
     public function down()
     {
         //
+        /*
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('phone_number');
             $table->dropColumn('fullname');
@@ -47,5 +49,6 @@ return new class extends Migration
             $table->dropColumn('country_id');
             $table->dropColumn('membership_id');
         });
+        */
     }
 };
