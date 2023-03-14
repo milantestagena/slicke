@@ -8,35 +8,40 @@ use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\UserPublicResource;
 use App\Http\Requests\StoreConversationRequest;
+
 
 class ConversationController extends Controller
 {
     //
     use HttpResponses;
-    private $user;
-    public function _construct()
-    {
-        parent::_construct();
-        $this->user = Auth::user();
-    }
+
     public function getConversations()
     {
-        $data = Conversation::getConversations($this->user);
+        $user = Auth::user();
+        $data = Conversation::getConversations($user);
         return $this->success($data);
     }
 
-    public function getConversation( Request $request)
+    public function getConversation(int $with)
     {
-        $data = Conversation::getConversation($this->user, $request->query('with'));
-        return $this->success($data);
+        $user = Auth::user();
+        $data = Conversation::getConversation($user, $with);
+        $corespondent = User::findOrFail($with);
+        return $this->success(
+            (object)[
+                'conversation' => $data,
+                'corenspondent' => new UserPublicResource($corespondent)
+            ]);
     }
 
-    public function sendMessage( StoreConversationRequest $request)
+    public function sendMessage(int $to,  StoreConversationRequest $request)
     {
+        $user = Auth::user();
         $to = $request->query('to');
         $message = new Conversation;
-        $message->from = $this->user->id;
+        $message->from = $user->id;
         $message->to = $to;
         $message->message = $request->input('message');
 

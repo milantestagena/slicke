@@ -27,9 +27,9 @@ class CollectionController extends Controller
         return $this->success($data);
     }
 
-    public function getCollectionForUser(Collection $collection){
+    public function getCollectionForUser(Request $request){
 
-        $data = $this->userModel->getCollection($collection);
+        $data = $this->userModel->getCollection($request->query('id'));
         return $this->success($data->items());
     }
 }
