@@ -59,7 +59,10 @@ class UserCollection extends Model
     }
     public static function userCollection($user, $collectionId)
     {
-        return UserCollection::where('user_id', $user->id)->where('collection_id', $collectionId)->get()->firstOrFail();
+        return UserCollection::firstOrCreate([
+            'user_id' => $user->id,
+            'collection_id' => $collectionId
+        ]);
     }
     public static function createNew($user, $collectionId)
     {

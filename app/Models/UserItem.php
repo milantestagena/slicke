@@ -48,22 +48,14 @@ class UserItem extends Model
     }
     public static function createForUserCollection($ucID, $collectionId)
     {
-
-        return UserItem::belongsTo(Item::class, 'item_id');
-        try {
-            $itemsForCollection = Item::getForCollection($collectionId);
-            foreach($itemsForCollection as $ci){
-                UserItem::create(
-                    [
-                        'user_collection_id' => $ucID,
-                        'item_id' => $ci->id,
-                    ]
-                );
-            }
-            return true;
-        } catch (\Throwable $th) {
-            //throw $th;
-            return false;
+        $itemsForCollection = Item::getForCollection($collectionId);
+        foreach($itemsForCollection as $ci){
+            UserItem::firstOrCreate(
+                [
+                    'user_collection_id' => $ucID,
+                    'item_id' => $ci->id,
+                ]
+            );
         }
     }
 

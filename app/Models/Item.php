@@ -49,4 +49,8 @@ class Item extends Model
     {
         return $this->hasMany(ProposalItem::class, 'item_id');
     }
+
+    public static function getForCollection(int $collectionId){
+        return Item::where('collection_id', $collectionId)->get();
+    }
 }
