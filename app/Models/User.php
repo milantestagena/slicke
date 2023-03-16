@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -71,15 +72,17 @@ class User extends Authenticatable
         return $this->hasMany(Proposal::class, 'receiver_id');
     }
 
-    public function collections(): HasMany
+    public function userCollections(): HasMany
     {
         return $this->hasMany(UserCollection::class, 'user_id');
     }
 
-    public function getCollection(Collection $collection): HasMany
+    public function userCollection(Collection $collection): HasOne
     {
-        return $this->hasOne(UserCollection::class, 'user_id')->where('collection_id', $collection->id)->first();
+        return $this->hasMany(UserCollection::class, 'user_id')->where('collection_id', $collection->id)->first();
     }
+
+
     public function country(): BelongsTo
     {
         return $this->belongsTo(Countries::class);

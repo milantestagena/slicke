@@ -28,9 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/send_message/{to}', 'sendMessage');
     });
     Route::controller(CollectionController::class)->group(function () {
-        Route::get('/collections', 'getCollectionsForUser');
-        Route::get('/collection/{id}', 'getCollectionForUser');
-        Route::post('/collection/{id}', 'updateCollectionForUser');
+        Route::get('/collections', 'getCollections');
+        Route::get('/select_collection/{id}', 'setCollectionForUser');
+    });
+    Route::controller(UserCollectionController::class)->group(function () {
+        Route::get('/user_collections', 'getCollectionsForUser');
+        Route::get('/user_collection/{id}', 'getCollectionForUser');
+        Route::post('/user_collection/{id}', 'updateCollectionForUser');
     });
 });
 

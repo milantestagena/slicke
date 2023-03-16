@@ -46,6 +46,25 @@ class UserItem extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
+    public static function createForUserCollection($ucID, $collectionId)
+    {
 
+        return UserItem::belongsTo(Item::class, 'item_id');
+        try {
+            $itemsForCollection = Item::getForCollection($collectionId);
+            foreach($itemsForCollection as $ci){
+                UserItem::create(
+                    [
+                        'user_collection_id' => $ucID,
+                        'item_id' => $ci->id,
+                    ]
+                );
+            }
+            return true;
+        } catch (\Throwable $th) {
+            //throw $th;
+            return false;
+        }
+    }
 
 }
