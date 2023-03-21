@@ -2,11 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\CollectionItemsPublic;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\CollectionCountriesPublic;
 
-class CollectionsPublic extends JsonResource
+class CollectionItemsPublic extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,21 +14,18 @@ class CollectionsPublic extends JsonResource
      */
     public function toArray($request)
     {
-        $response = [];
+        $ret = [];
         foreach($this as $data){
             foreach($data as $model){
-                $response[] = (object)[
+                $ret[] = (object)[
                     "id"=> $model->id,
-                    "type"=> $model->type,
-                    "name"=> $model->name,
+                    "identifier"=> $model->identifier,
                     "description"=> $model->description,
                     "link"=> $model->link,
-                    "year"=> $model->year,
-                    "items"=> new CollectionItemsPublic($model->items),
-                    "countries"=> new CollectionCountriesPublic($model->countries)
+                    "title"=> $model->title
                 ];
             }
         }
-        return $response;
+        return $ret;
     }
 }

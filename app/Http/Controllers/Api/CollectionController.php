@@ -29,6 +29,11 @@ class CollectionController extends Controller
         return $this->success(new CollectionsPublic($data));
     }
 
+    public function getAvailableCollections(){
+        $data = Collection::getAvailableCollections(Auth::user());
+        return $this->success(new CollectionsPublic($data));
+    }
+
     public function setCollectionForUser(int $collectionId){
         try {
             $ucID = UserCollection::userCollection(Auth::user(), $collectionId)->id;

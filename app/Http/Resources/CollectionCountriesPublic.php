@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CollestionItemsPublic extends JsonResource
+class CollectionCountriesPublic extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,10 +19,8 @@ class CollestionItemsPublic extends JsonResource
             foreach($data as $model){
                 $ret[] = (object)[
                     "id"=> $model->id,
-                    "identifier"=> $model->identifier,
-                    "description"=> $model->description,
-                    "link"=> $model->link,
-                    "title"=> $model->title
+                    "country"=> $model->country,
+                    "region"=> $model->region,
                 ];
             }
         }
