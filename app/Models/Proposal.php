@@ -59,4 +59,14 @@ class Proposal extends Model
     {
         return $this->hasMany(ProposalItem::class, 'proposal_id');
     }
+
+    public function createItems($userId, $items){
+        foreach($items as $item){
+            ProposalItem::create([
+                'proposal_id' => $this->id,
+                'user_id' => $userId,
+                'item_id' => $item,
+            ]);
+        }
+    }
 }

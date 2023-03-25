@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\UserCollectionController;
@@ -38,6 +39,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user_collection/{id}', 'getCollectionForUser');
         Route::post('/user_collection/{id}', 'updateCollectionForUser');
     });
+    Route::controller(ProposalController::class)->group(function () {
+        Route::put('/accept_proposal/{id}', 'acceptProposal');
+        Route::put('/refuse_proposal/{id}', 'refuseProposal');
+        Route::get('/get_proposal/{id}', 'getProposal');
+        Route::post('/create_proposal', 'createProposal');
+    });
+    
 });
 
 Route::post('/signup', [AuthController::class, 'signup']);

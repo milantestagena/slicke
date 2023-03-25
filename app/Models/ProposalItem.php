@@ -16,7 +16,7 @@ class ProposalItem extends Model
      */
     protected $fillable = [
         'proposal_id',
-        'receiver_id',
+        'user_id',
         'item_id',
     ];
 

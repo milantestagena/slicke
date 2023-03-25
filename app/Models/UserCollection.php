@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserCollection extends Model
 {
@@ -65,8 +67,26 @@ class UserCollection extends Model
         ]);
     }
 
-    public static function createNew($user, $collectionId)
+    public static function getCollectionId($userId, $collectionId)
     {
-        return UserCollection::where('user_id', $user->id)->where('collection_id', $collectionId)->first();
+        return UserCollection::where('user_id', (int)$userId)->where('collection_id', (int)$collectionId)->first()->id;
+    }
+
+    public static function checkForDoubles($collectionId, $userId, $doubles){
+        $forLogged = Auth::user()->id === $userId;
+        $userCollectionId = UserCollection::getCollectionId($userId, $collectionId);
+        $possibleDoubles = UserItem::where('user_collection_id', $userCollectionId)->whereIn('item_id', $doubles)->get();
+
+        foreach($possibleDoubles as $double){
+            if($double->counter <=1){
+                if($forLogged){
+                    $errorMesage = "Some of your items is not duplicate.";
+                } else {
+                    $errorMesage = "Some of items you selected is not duplicate anymore."; 
+                }
+                throw new \Exception($errorMesage);
+            }
+        }
+        return true;
     }
 }
