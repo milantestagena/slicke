@@ -8,7 +8,8 @@ use App\Traits\HttpResponses;
 use App\Models\UserCollection;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\UserColectionPublic;
+use App\Http\Resources\CollectionsPublic;
+use App\Http\Resources\UserCollectionPublic;
 
 class UserCollectionController extends Controller
 {
@@ -16,21 +17,18 @@ class UserCollectionController extends Controller
     use HttpResponses;
     private $user;
     private $userModel;
-    private function setUser()
-    {
-        $this->user = Auth::user();
-        $this->userModel = User::where('id', $this->user->id)->first();
-    }
+
     public function getCollectionsForUser(){
-        $data = UserCollection::userCollections($this->user);
-        return $this->success(new UserColectionPublic($data));
+        $data = UserCollection::userCollections(Auth::user());
+        return $this->success(new CollectionsPublic($data));
     }
     public function getCollectionForUser(int $collectionId){
-        $data = UserCollection::userCollection($this->user, $collectionId);
-        return $this->success(new UserColectionPublic($data));
+        $data = UserCollection::findOrFail($collectionId);
+   
+        return $this->success(new UserCollectionPublic($data));
     }
     public function updateCollectionForUser(){
         $data = UserCollection::getCollections();
-        return $this->success(new UserColectionPublic($data));
+        return $this->success(new UserCollectionPublic($data));
     }
 }

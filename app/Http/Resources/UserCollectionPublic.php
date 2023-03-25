@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\CollectionPublic;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserColectionPublic extends JsonResource
+class UserCollectionPublic extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,6 +15,11 @@ class UserColectionPublic extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $response = (object)[
+            "id"=> $this->id,
+            "collection"=> new CollectionPublic($this->collection),
+            "items" => new UserItemsPublic($this->items)
+        ];
+        return $response;
     }
 }

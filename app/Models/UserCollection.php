@@ -11,7 +11,7 @@ class UserCollection extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_collections';
+    //protected $table = 'user_collections';
     /**
      * The attributes that are mass assignable.
      *
@@ -41,17 +41,17 @@ class UserCollection extends Model
 
     public function collection(): BelongsTo
     {
-        return $this->belongsTo(Collection::class, 'collection_id');
+        return $this->belongsTo(Collection::class);
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function item(): HasMany
+    public function items(): HasMany
     {
-        return $this->hasMany(Item::class, 'item_id');
+        return $this->hasMany(UserItem::class, 'user_collection_id');
     }
     public static function userCollections($user)
     {
@@ -64,6 +64,7 @@ class UserCollection extends Model
             'collection_id' => $collectionId
         ]);
     }
+
     public static function createNew($user, $collectionId)
     {
         return UserCollection::where('user_id', $user->id)->where('collection_id', $collectionId)->first();
