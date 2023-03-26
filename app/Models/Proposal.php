@@ -69,4 +69,26 @@ class Proposal extends Model
             ]);
         }
     }
+
+    public function checkIfIsStillActive(){
+        $senderItems = $this->items->where('user_id', '=', $this->sender_id)->pluck('user_item_id');
+        $receiverItems = $this->items->where('user_id', '=', $this->receiver_id)->pluck('user_item_id');
+        UserCollection::checkForDoubles($this->collection_id, $this->sender_id, $senderItems);
+        UserCollection::checkForDoubles($this->collection_id, $this->receiver_id, $receiverItems);
+    }
+
+    public function accept(){
+        foreach($this->items as $item){
+            $isSender = $this->sender_id === $item->user_id;
+            $item->item->decrement('counter', 1);
+            if($isSender){
+                $userCollectionId = UserCollection::getCollectionId($this->receiver_id, $this->collection_id);
+            } else {
+                $userCollectionId = UserCollection::getCollectionId($this->sender_id, $this->collection_id);
+            }
+            UserItem::where('user_collection_id', $userCollectionId)->where('item_id', $item->item->item->id)->increment('counter', 1);
+        }
+        $this->state = 'accepted';
+        $this->save();
+    }
 }

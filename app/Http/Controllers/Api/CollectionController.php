@@ -36,7 +36,7 @@ class CollectionController extends Controller
 
     public function setCollectionForUser(int $collectionId){
         try {
-            $ucID = UserCollection::userCollection(Auth::user(), $collectionId)->id;
+            $ucID = UserCollection::userCollection(Auth::user()->id, $collectionId)->id;
             UserItem::createForUserCollection($ucID, $collectionId);
             return $this->success(['UserCollectionId' =>  $ucID], 'OK');
         } catch (\Throwable $th) {

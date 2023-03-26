@@ -17,7 +17,7 @@ class ProposalItem extends Model
     protected $fillable = [
         'proposal_id',
         'user_id',
-        'item_id',
+        'item_id'
     ];
 
     /**
@@ -49,6 +49,6 @@ class ProposalItem extends Model
 
     public function item(): BelongsTo
     {
-        return $this->belongsTo(Item::class, 'item_id');
+        return $this->belongsTo(UserItem::class, 'user_item_id');
     }
 }

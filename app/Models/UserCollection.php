@@ -59,10 +59,10 @@ class UserCollection extends Model
     {
         return UserCollection::where('user_id', $user->id)->get();
     }
-    public static function userCollection($user, $collectionId)
+    public static function userCollection($userId, $collectionId)
     {
         return UserCollection::firstOrCreate([
-            'user_id' => $user->id,
+            'user_id' => $userId,
             'collection_id' => $collectionId
         ]);
     }
@@ -74,10 +74,9 @@ class UserCollection extends Model
 
     public static function checkForDoubles($collectionId, $userId, $doubles){
         $forLogged = Auth::user()->id === $userId;
-        $userCollectionId = UserCollection::getCollectionId($userId, $collectionId);
-        $possibleDoubles = UserItem::where('user_collection_id', $userCollectionId)->whereIn('item_id', $doubles)->get();
 
-        foreach($possibleDoubles as $double){
+        foreach($doubles as $id){
+            $double = UserItem::findOrFail($id);
             if($double->counter <=1){
                 if($forLogged){
                     $errorMesage = "Some of your items is not duplicate.";

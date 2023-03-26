@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreApiProposalRequest;
+use App\Http\Resources\ProposalPublicResouce;
 use App\Models\Proposal;
 use App\Models\UserCollection;
 use App\Traits\HttpResponses;
@@ -35,5 +36,39 @@ class ProposalController extends Controller
             return $this->error('Proposal not created', 400, $th->getMessage());
         }
 
+    }
+
+    public function getProposal(int $id){
+        $proposal  = Proposal::findOrFail($id);
+        if(!$proposal){
+            return $this->error("Proposal not found");
+        }
+        try{
+            $proposal->checkIfIsStillActive();
+            return $this->success(new ProposalPublicResouce($proposal));
+        } catch (\Throwable $th) {
+            $proposal->state = 'not_possible';
+            $proposal->save();
+            return $this->error("Proposal not active", 400, $th->getMessage());
+        }
+    }
+    public function acceptProposal(int $id){
+        $proposal  = Proposal::findOrFail($id);
+        if($proposal){
+            $proposal->accept();
+            return $this->success("Proposal accepted");
+        } else {
+            return $this->error("Proposal not found");
+        }
+    }
+    public function refuseProposal(int $id){
+        $proposal  = Proposal::findOrFail($id);
+        if($proposal){
+            $proposal->state = 'rejected';
+            $proposal->save();
+            return $this->success('Proposal rejected');
+        } else {
+            return $this->error("Proposal not found");
+        }
     }
 }
