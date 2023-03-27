@@ -74,14 +74,8 @@ class User extends Authenticatable
 
     public function userCollections(): HasMany
     {
-        return $this->hasMany(UserCollection::class, 'user_id');
+        return $this->hasMany(UserCollection::class);
     }
-
-    public function userCollection(Collection $collection): HasOne
-    {
-        return $this->hasMany(UserCollection::class, 'user_id')->where('collection_id', $collection->id)->first();
-    }
-
 
     public function country(): BelongsTo
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\UpdateUserCollectionRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
@@ -27,8 +28,16 @@ class UserCollectionController extends Controller
    
         return $this->success(new UserCollectionPublic($data));
     }
-    public function updateCollectionForUser(){
-        $data = UserCollection::getCollections();
-        return $this->success(new UserCollectionPublic($data));
+    public function updateCollectionForUser($id, UpdateUserCollectionRequest $request){
+       try {
+        $data =json_decode($request->getContent());
+        $collection = UserCollection::where('id', $id)->where('user_id', Auth::user()->id)->first();
+        $collection->updateItems($data->items);
+
+        return $this->success("Success");
+       } catch (\Throwable $th) {
+        return $this->error('Update fail', 400, $th->getMessage());
+       }
+       
     }
 }

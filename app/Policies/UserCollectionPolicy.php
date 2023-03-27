@@ -31,6 +31,7 @@ class UserCollectionPolicy
     public function view(User $user, UserCollection $userCollection)
     {
         //
+        return $user->id === $userCollection->user_id;
     }
 
     /**

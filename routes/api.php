@@ -37,7 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(UserCollectionController::class)->group(function () {
         Route::get('/user_collections', 'getCollectionsForUser');
         Route::get('/user_collection/{id}', 'getCollectionForUser');
-        Route::post('/user_collection/{id}', 'updateCollectionForUser');
+        Route::put('/user_collection/{id}', 'updateCollectionForUser');
     });
     Route::controller(ProposalController::class)->group(function () {
         Route::put('/accept_proposal/{id}', 'acceptProposal');

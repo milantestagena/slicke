@@ -88,4 +88,12 @@ class UserCollection extends Model
         }
         return true;
     }
+
+    public function updateItems($items){
+        foreach($items as $key => $value){
+            $ui = UserItem::find((int)$key);
+            $ui->counter = $value;
+            $ui->update();
+        }
+    }
 }
