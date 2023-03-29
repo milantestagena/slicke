@@ -3,22 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserItem extends Model
+class Double extends Model
 {
     use HasFactory;
-    /**
+     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_collection_id',
-        'item_id',
-        'count'
     ];
 
     /**
@@ -27,7 +24,6 @@ class UserItem extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-
     ];
 
     /**
@@ -38,6 +34,16 @@ class UserItem extends Model
     protected $casts = [
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'collection_id');
+    }
+
     public function userCollection(): BelongsTo
     {
         return $this->belongsTo(UserCollection::class, 'user_collection_id');
@@ -47,17 +53,7 @@ class UserItem extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
-    public static function createForUserCollection($ucID, $collectionId)
-    {
-        $itemsForCollection = Item::getForCollection($collectionId);
-        foreach($itemsForCollection as $ci){
-            UserItem::firstOrCreate(
-                [
-                    'user_collection_id' => $ucID,
-                    'item_id' => $ci->id,
-                ]
-            );
-        }
-    }
-}
 
+
+
+}

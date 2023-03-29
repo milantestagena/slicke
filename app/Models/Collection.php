@@ -62,4 +62,15 @@ class Collection extends Model
     {
         return $this->belongsToMany(Countries::class, 'collections_per_countries', 'collection_id', 'country_id');
     }
+
+    public function doubles(): HasMany
+    {
+        return $this->hasMany(Double::class, 'collection_id');
+    }
+
+    public function missing(): HasMany
+    {
+        return $this->hasMany(Missing::class, 'collection_id');
+    }
+
 }

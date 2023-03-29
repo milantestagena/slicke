@@ -67,6 +67,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Proposal::class, 'sender_id');
     }
+
     public function proposalReceived(): HasMany
     {
         return $this->hasMany(Proposal::class, 'receiver_id');
@@ -80,5 +81,20 @@ class User extends Authenticatable
     public function country(): BelongsTo
     {
         return $this->belongsTo(Countries::class);
+    }
+
+    public function doubles(): HasMany
+    {
+        return $this->hasMany(Double::class, 'user_id');
+    }
+
+    public function missing(): HasMany
+    {
+        return $this->hasMany(Missing::class, 'user_id');
+    }
+
+    public function itemsMatching(): HasMany
+    {
+        return $this->hasMany(ItemsMatching::class, 'user_id');
     }
 }

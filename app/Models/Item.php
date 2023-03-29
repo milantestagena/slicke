@@ -53,4 +53,14 @@ class Item extends Model
     public static function getForCollection(int $collectionId){
         return Item::where('collection_id', $collectionId)->get();
     }
+
+    public function doubles(): HasMany
+    {
+        return $this->hasMany(Double::class, 'item_id');
+    }
+
+    public function missing(): HasMany
+    {
+        return $this->hasMany(Missing::class, 'item_id');
+    }
 }
