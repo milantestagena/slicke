@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ItemsMatching extends Model
 {
     use HasFactory;
-     /**
+    
+    protected $table = 'items_matching';
+    
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -59,6 +62,7 @@ class ItemsMatching extends Model
 
     public static function insertBatchForUser($batch){
         ItemsMatching::insert($batch);
+        
     }
 
     public static function getMatchesForUser($collectionId, $userId){
@@ -98,4 +102,10 @@ class ItemsMatching extends Model
         return $data;
     }
 
+    public static function rebuildMatching(UserCollection $userCollection){
+
+        ItemsMatching::deleteForUser($userCollection->user->id);
+        $data = $userCollection->prepareMatchingDataForBatchInsert();
+        ItemsMatching::insertBatchForUser($data);
+    }
 }

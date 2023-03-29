@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\UpdateUserCollectionRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\ItemsMatching;
 use App\Traits\HttpResponses;
 use App\Models\UserCollection;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\CollectionsPublic;
 use App\Http\Resources\UserCollectionPublic;
+use App\Http\Requests\UpdateUserCollectionRequest;
 
 class UserCollectionController extends Controller
 {
@@ -31,9 +32,10 @@ class UserCollectionController extends Controller
     public function updateCollectionForUser($id, UpdateUserCollectionRequest $request){
        try {
         $data =json_decode($request->getContent());
-        $collection = UserCollection::where('id', $id)->where('user_id', Auth::user()->id)->first();
-        $collection->updateItems($data->items);
-
+        $userCollection = UserCollection::where('id', $id)->where('user_id', Auth::user()->id)->first();
+        $userCollection->updateItems($data->items);
+        $userCollection->updateMatchingEntities();
+        ItemsMatching::rebuildMatching($userCollection);
         return $this->success("Success");
        } catch (\Throwable $th) {
         return $this->error('Update fail', 400, $th->getMessage());

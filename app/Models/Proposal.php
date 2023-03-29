@@ -82,11 +82,13 @@ class Proposal extends Model
             $isSender = $this->sender_id === $item->user_id;
             $item->item->decrement('counter', 1);
             if($isSender){
-                $userCollectionId = UserCollection::getCollectionId($this->receiver_id, $this->collection_id);
+                $userCollection = UserCollection::userCollection($this->receiver_id, $this->collection_id);
             } else {
-                $userCollectionId = UserCollection::getCollectionId($this->sender_id, $this->collection_id);
+                $userCollection = UserCollection::userCollection($this->sender_id, $this->collection_id);
             }
-            UserItem::where('user_collection_id', $userCollectionId)->where('item_id', $item->item->item->id)->increment('counter', 1);
+            UserItem::where('user_collection_id', $userCollection->id)->where('item_id', $item->item->item->id)->increment('counter', 1);
+            $userCollection->updateMatchingEntities();
+            ItemsMatching::rebuildMatching($userCollection);
         }
         $this->state = 'accepted';
         $this->save();
