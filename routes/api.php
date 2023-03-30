@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\UserCollectionController;
 
@@ -47,6 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
 });
+
+Route::get('/get_all_countries', [CountryController::class, 'getAll']);
+Route::get('get_all_membership', [MembershipController::class, 'getAll']);
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
