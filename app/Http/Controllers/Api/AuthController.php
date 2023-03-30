@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\SignupRequest;
 use App\Models\User;
-use App\Traits\HttpResponses;
 use Illuminate\Http\Request;
+use App\Traits\HttpResponses;
+use App\Http\Requests\LoginRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SignupRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\UserPublicResource;
 
 class AuthController extends Controller
 {
@@ -41,10 +42,10 @@ class AuthController extends Controller
         }
 
         /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $user = User::findOrFail(Auth::user()->id);
         $token = $user->createToken('main')->plainTextToken;
         return $this->success([
-            'user' => $user,
+            'user' => new UserPublicResource($user),
             'token' => $token
         ]);
     }

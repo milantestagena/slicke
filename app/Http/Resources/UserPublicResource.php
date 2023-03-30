@@ -27,6 +27,8 @@ class UserPublicResource extends JsonResource
             "longitude" => $this->longitude,
             "country" => $this->country->country,
             "region" => $this->country->region,
+            "membership" => new MembershipOnePublicResource($this->membership),
+            "membership_prices" => new MembershipPricePublicResource($this->country->membershipPrice),
         ];
     }
 }

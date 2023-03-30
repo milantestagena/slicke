@@ -54,21 +54,26 @@ class ItemsMatching extends Model
         return $this->belongsTo(User::class, 'user_2_id');
     }
 
-
-    public static function deleteForUser($userId){
-        ItemsMatching::where('user_1_id', '=', $userId)->delete();
-        ItemsMatching::where('user_2_id', '=', $userId)->delete();
+    public static function deleteForUser($collection_id, $userId){
+        $itemsMatching = new ItemsMatching;
+        $itemsMatching->setTable('items_matching_'.$collection_id);
+        $itemsMatching->where('user_1_id', '=', $userId)->delete();
+        $itemsMatching->where('user_2_id', '=', $userId)->delete();
     }
 
-    public static function insertBatchForUser($batch){
-        ItemsMatching::insert($batch);
+    public static function insertBatchForUser($collection_id, $batch){
+        $itemsMatching = new ItemsMatching;
+        $itemsMatching->setTable('items_matching_'.$collection_id);
+        $itemsMatching->insert($batch);
         
     }
 
     public static function getMatchesForUser($collectionId, $userId){
+        $itemsMatching = new ItemsMatching;
+        $itemsMatching->setTable('items_matching_'.$collectionId);
         $data = [];
         // handle all as user_1_id
-        $first = ItemsMatching::where('collection_id', '=', $collectionId)
+        $first = $itemsMatching->where('collection_id', '=', $collectionId)
             ->where('user_1_id', '=', $userId)->get();
         foreach($first as $el){
             $data[$el->user_2_id] = [
@@ -80,7 +85,7 @@ class ItemsMatching extends Model
                 'membership' => $el->user2->membership_id
             ];
         }
-        $second = ItemsMatching::where('collection_id', '=', $collectionId)
+        $second = $itemsMatching->where('collection_id', '=', $collectionId)
             ->where('user_2_id', '=', $userId)->get();
         foreach($second as $el){
             $data[$el->user_1_id] = [
@@ -103,9 +108,8 @@ class ItemsMatching extends Model
     }
 
     public static function rebuildMatching(UserCollection $userCollection){
-
-        ItemsMatching::deleteForUser($userCollection->user->id);
+        ItemsMatching::deleteForUser($userCollection->collection->id, $userCollection->user->id);
         $data = $userCollection->prepareMatchingDataForBatchInsert();
-        ItemsMatching::insertBatchForUser($data);
+        ItemsMatching::insertBatchForUser($userCollection->collection->id, $data);
     }
 }

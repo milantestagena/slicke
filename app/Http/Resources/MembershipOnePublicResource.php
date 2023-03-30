@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MembershipPublicResource extends JsonResource
+class MembershipOnePublicResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,10 @@ class MembershipPublicResource extends JsonResource
      */
     public function toArray($request)
     {
-        $formated = [];
-        foreach($this as $collection){
-            foreach($collection as $membership){
-                $formated[] = new MembershipOnePublicResource($membership);
-            }
-        }
-        return $formated;
+        return (object) [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description
+        ];;
     }
 }
