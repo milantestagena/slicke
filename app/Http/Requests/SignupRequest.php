@@ -34,7 +34,9 @@ class SignupRequest extends FormRequest
                     ->letters()
                     ->symbols()
                     ->numbers()
-            ]
+            ],
+            'country_id' => ['required', 'exists:countries,id'],
+            'membership_id' => ['required', 'exists:memberships,id']
         ];
     }
 }
