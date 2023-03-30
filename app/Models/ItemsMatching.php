@@ -79,8 +79,8 @@ class ItemsMatching extends Model
             $data[$el->user_2_id] = [
                 'toGiveCount' =>  $el->item_count_1,
                 'toTakeCount' =>  $el->item_count_2,
-                'toGiveIds' =>  explode($el->item_ids_1, "|"),
-                'toTakeIds' =>  explode($el->item_ids_2, "|"),
+                'toGiveIds' =>  explode("|", $el->item_ids_1),
+                'toTakeIds' =>  explode("|", $el->item_ids_2),
                 'minCount' => min($el->item_count_1, $el->item_count_2),
                 'membership' => $el->user2->membership_id
             ];
@@ -91,8 +91,8 @@ class ItemsMatching extends Model
             $data[$el->user_1_id] = [
                 'toGiveCount' =>  $el->item_count_2,
                 'toTakeCount' =>  $el->item_count_1,
-                'toGiveIds' =>  explode($el->item_ids_2, "|"),
-                'toTakeIds' =>  explode($el->item_ids_1, "|"),
+                'toGiveIds' =>  explode("|", $el->item_ids_2),
+                'toTakeIds' =>  explode("|", $el->item_ids_1),
                 'minCount' => min($el->item_count_1, $el->item_count_2),
                 'membership' => $el->user1->membership_id
             ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ItemsMatchingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -47,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/get_proposal/{id}', 'getProposal');
         Route::post('/create_proposal', 'createProposal');
     });
+    Route::controller(ItemsMatchingController::class)->group(function () {
+        Route::get('/matches/{UserCollectionId}', 'getMatchesForUser');
+    });
+    
     
 });
 
