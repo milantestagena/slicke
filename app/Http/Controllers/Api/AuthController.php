@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('main')->plainTextToken;
         return $this->success([
-            'user' => $user,
+            'user' => new UserPublicResource($user),
             'token' => $token
         ]);
     }
