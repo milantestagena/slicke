@@ -105,4 +105,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(ItemsMatching::class, 'user_id');
     }
+
+    public static function getUsersForCollection($collectionId, $term){
+        return UserCollection::join("users", "user_collections.user_id", '=', "users.id")
+        ->select("users.*")
+        ->where('user_collections.collection_id', '=', $collectionId)
+        ->where('users.name', 'like', '%'.$term.'%')
+        ->orderBy('users.membership_id', 'DESC')->get();
+    }
+    public static function getUsers($term){
+        return User::where('users.name', 'like', '%'.$term.'%')
+        ->orderBy('membership_id', 'DESC')->orderBy('users.membership_id', 'DESC')->get();
+    }
+
 }

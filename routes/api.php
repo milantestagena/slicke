@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\ItemsMatchingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\ProposalController;
 use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\ItemsMatchingController;
 use App\Http\Controllers\Api\UserCollectionController;
 
 /*
@@ -51,7 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ItemsMatchingController::class)->group(function () {
         Route::get('/matches/{UserCollectionId}', 'getMatchesForUser');
     });
-    
+    Route::controller(UserController::class)->group(function () {
+        Route::get('get_users_for_collection/{collectionId}/{term}', 'getUsersForCollection');
+        Route::get('get_users/{term}', 'getUsers');
+    });
     
 });
 
