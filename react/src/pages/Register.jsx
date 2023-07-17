@@ -5,6 +5,21 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+
+
+async function Country() {
+	try {
+		const response = await axios.get("http://127.0.0.1:8000/api/get_all_countries");
+		console.log(response);
+	}
+	catch (error) {
+		console.log(error);
+	}
+}
+
+Country()
 
 function Register() {
   const [formData, setFormData] = useState({
