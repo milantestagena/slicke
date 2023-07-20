@@ -56,11 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get_users_for_collection/{collectionId}/{term}', 'getUsersForCollection');
         Route::get('get_users/{term}', 'getUsers');
     });
-    
+
 });
 
 Route::get('/get_all_countries', [CountryController::class, 'getAll']);
-Route::get('get_all_membership', [MembershipController::class, 'getAll']);
+Route::get('/get_all_membership', [MembershipController::class, 'getAll']);
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);

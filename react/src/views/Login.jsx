@@ -19,7 +19,6 @@ export default function Login() {
     }
     axiosClient.post('/login', payload)
       .then(({data}) => {
-        console.log(data);
         setUser(data.data.user)
         setToken(data.data.token);
       })

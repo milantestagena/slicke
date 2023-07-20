@@ -14,9 +14,8 @@ use App\Http\Resources\UserPublicResource;
 class AuthController extends Controller
 {
     use HttpResponses;
-    public function signup(Request $request)
+    public function signup(SignupRequest $request)
     {
-        dd($request);
         $data = $request->validated();
         /** @var \App\Models\User $user */
         $user = User::create([

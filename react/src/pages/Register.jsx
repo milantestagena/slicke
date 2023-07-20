@@ -9,17 +9,17 @@ import axios from "axios";
 
 
 
-async function Country() {
-	try {
-		const response = await axios.get("http://127.0.0.1:8000/api/get_all_countries");
-		console.log(response);
-	}
-	catch (error) {
-		console.log(error);
-	}
-}
+// async function Country() {
+// 	try {
+// 		const response = await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
+// 		console.log(response);
+// 	}
+// 	catch (error) {
+// 		console.log(error);
+// 	}
+// }
 
-Country()
+// Country()
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -27,9 +27,8 @@ function Register() {
     name: '',
     password: '',
     password_confirmation: '',
-    country_id: '185',
-    membership_id: '1',
-
+    country_id: '',
+    membership_id: ''
   });
 
   const onChange = (e) => {
@@ -57,13 +56,13 @@ function Register() {
         password,
         password_confirmation,
         country_id,
-        membership_id: '1',
+        membership_id,
       };
       dispatch(register(userData));
     }
   };
 
-  const { name, email, password, password_confirmation, country_id } = formData;
+  const { name, email, password, password_confirmation, country_id, membership_id } = formData;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -92,7 +91,7 @@ function Register() {
               placeholder="Enter your name"
               onChange={onChange}
             />
-          </div>{" "}
+          </div>
           <div className="form-group">
             <input
               type="email"
@@ -130,10 +129,21 @@ function Register() {
             <input
               type="text"
               className="form-control"
-              id="country"
-              name="country"
-              value= "185"
+              id="country_id"
+              name="country_id"
+              value= {country_id}
               placeholder="Enter country"
+              onChange={onChange}
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              className="form-control"
+              id="membership_id"
+              name="membership_id"
+              value={membership_id}
+              placeholder="membership_id"
               onChange={onChange}
             />
           </div>
@@ -143,9 +153,9 @@ function Register() {
             </button>
           </div>
           <div className="form-control">
-            <span>All Ready User ?</span>
+            <span>All Ready User?</span>
             <Link to="/login">
-              <span className="button"> Log In </span>
+              <span className="button">Log In</span>
             </Link>
           </div>
         </form>

@@ -1,12 +1,12 @@
 import axios from "axios";
-
+import axiosClient from "../../axios-client"
 const API_URL = "http://localhost:8000/api/signup";
 
 
 // register user
 
 const register= async (userData) => {
-  const response = await axios.post(API_URL, userData)
+  const response = await axiosClient.post(API_URL, userData)
 
   if (response.data){
     localStorage.setItem('user', JSON.stringify(response.data))
