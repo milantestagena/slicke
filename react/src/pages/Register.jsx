@@ -5,30 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import axios from "axios";
-
-
-
-// async function Country() {
-// 	try {
-// 		const response = await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
-// 		console.log(response);
-// 	}
-// 	catch (error) {
-// 		console.log(error);
-// 	}
-// }
-
-// Country()
+import Spinner from "../components/Spinner";
 
 function Register() {
   const [formData, setFormData] = useState({
-    email: '',
-    name: '',
-    password: '',
-    password_confirmation: '',
-    country_id: '',
-    membership_id: ''
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+    country_id: "",
+    membership_id: "",
   });
 
   const onChange = (e) => {
@@ -37,32 +23,28 @@ function Register() {
       [e.target.name]: e.target.value,
     }));
   };
-  /*
-    'name' => $data['name'],
-    'email' => $data['email'],
-    'password' => bcrypt($data['password']),
-    'country_id' => $data['country_id'],
-    'membership_id' => $data['membership_id']
-   */
+
   const onSubmit = (e) => {
     e.preventDefault();
-
-    if (password !== password_confirmation) {
-      toast.error("Email do not match");
-    } else {
-      const userData = {
-        email,
-        name,
-        password,
-        password_confirmation,
-        country_id,
-        membership_id,
-      };
-      dispatch(register(userData));
-    }
+    const userData = {
+      name,
+      email,
+      password,
+      password_confirmation,
+      country_id,
+      membership_id,
+    };
+    dispatch(register(userData));
   };
 
-  const { name, email, password, password_confirmation, country_id, membership_id } = formData;
+  const {
+    name,
+    email,
+    password,
+    password_confirmation,
+    country_id,
+    membership_id,
+  } = formData;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -70,6 +52,23 @@ function Register() {
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
   );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess || user) {
+      navigate("/");
+    }
+
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, navigate, dispatch]);
+
+
+  if(isLoading){
+    return <Spinner />
+  }
 
   return (
     <>
@@ -121,7 +120,7 @@ function Register() {
               id="password_confirmation"
               name="password_confirmation"
               value={password_confirmation}
-              placeholder= "Confirm password"
+              placeholder="password confirmation"
               onChange={onChange}
             />
           </div>
@@ -131,7 +130,7 @@ function Register() {
               className="form-control"
               id="country_id"
               name="country_id"
-              value= {country_id}
+              value={country_id}
               placeholder="Enter country"
               onChange={onChange}
             />
@@ -143,7 +142,7 @@ function Register() {
               id="membership_id"
               name="membership_id"
               value={membership_id}
-              placeholder="membership_id"
+              placeholder="membership"
               onChange={onChange}
             />
           </div>
@@ -153,9 +152,9 @@ function Register() {
             </button>
           </div>
           <div className="form-control">
-            <span>All Ready User?</span>
+            <span>All Ready User ?</span>
             <Link to="/login">
-              <span className="button">Log In</span>
+              <span className="button"> Log In </span>
             </Link>
           </div>
         </form>
