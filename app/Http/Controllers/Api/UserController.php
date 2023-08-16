@@ -8,6 +8,7 @@ use App\Traits\HttpResponses;
 use App\Models\UserCollection;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -40,5 +41,18 @@ class UserController extends Controller
             return $this->error("User not found", 400);
         }
 
+    }
+    public function updateUser(string $id, UpdateUserRequest $request){
+        try {
+            $user = User::find(Auth::user()->id);
+            $data =$request->all();
+            foreach($data as $key => $parameter){
+                $user[$key] = $parameter;
+            }
+            $user->save();
+            return $this->success((object)$user);
+        } catch (\Throwable $th) {
+            return $this->error('Update fail', 400, $th->getMessage());
+        }
     }
 }
