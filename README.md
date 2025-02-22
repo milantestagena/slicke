@@ -10,6 +10,10 @@ https://laravel-react.com
 ## Installation 
 Make sure you have environment setup properly. You will need PHP8.1, composer and Node.js.
 
+Use Laravel ver 9.52.16
+PHP version 8.1
+
+
 1. Download the project (or clone using GIT)
 2. Copy `.env.example` into `.env` and configure database credentials
 3. Navigate to the project's root directory using terminal
