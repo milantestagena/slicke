@@ -13,9 +13,9 @@
 
 
 -- Dumping database structure for slicke
-DROP DATABASE IF EXISTS `slicke`;
-CREATE DATABASE IF NOT EXISTS `slicke` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `slicke`;
+-- DROP DATABASE IF EXISTS `slicke`;
+-- CREATE DATABASE IF NOT EXISTS `slicke` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+-- USE `slicke`;
 
 -- Dumping structure for table slicke.collections
 DROP TABLE IF EXISTS `collections`;
