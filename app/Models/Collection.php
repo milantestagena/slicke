@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Collection extends Model
 {
     use HasFactory;
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -47,15 +47,16 @@ class Collection extends Model
         return $this->hasMany(Item::class, 'collection_id');
     }
 
-    public static function getCollections(){
+    public static function getCollections()
+    {
         return Collection::all();
     }
 
-    public static function getAvailableCollections($user){
-        return Collection::join('collections_per_countries', 'collections.id', '=','collections_per_countries.collection_id')
-            ->join('countries', 'collections_per_countries.country_id', '=','countries.id')
-            ->where('countries.id', $user->country_id)
-            ->get();
+    public static function getAvailableCollections($user)
+    {
+        return Collection::whereHas('countries', function ($query) use ($user) {
+            $query->where('country_id', $user->country_id);
+        })->get();
     }
 
     public function countries(): BelongsToMany

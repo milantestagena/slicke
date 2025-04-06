@@ -57,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get_users_for_collection/{collectionId}/{term}', 'getUsersForCollection');
         Route::get('get_users/{term}', 'getUsers');
         Route::put('users/{id}', 'updateUser');
+        Route::get('get_user_for_session/{token}', 'getUserForSession');
+        Route::get('user', 'getUserByToken');
         //  function (Request $request) {
         //     dd(Auth::user()->id);
         // });

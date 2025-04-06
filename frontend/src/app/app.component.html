@@ -1,3 +1,20 @@
-<div>
-  {{ data | json }}
+<div class="container">
+  <div class="top-section">
+    <!-- Top section content -->
+    <h1>Top Section</h1>
+    <div class="top-right">
+      <app-login-form *ngIf="!store.User()?.id"></app-login-form>
+      <app-user-details *ngIf="store.User()?.id"></app-user-details>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="left-side">
+      <!-- Left side content -->
+      <h2>Left Side</h2>
+    </div>
+    <div class="content-area">
+      <!-- Main content area -->
+      <app-dynamic-host></app-dynamic-host>
+    </div>
+  </div>
 </div>

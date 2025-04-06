@@ -1,31 +1,56 @@
-import { Component, OnInit } from '@angular/core';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
-import { ApiService } from './api.service';
+import {
+  Component,
+  effect,
+  importProvidersFrom,
+  inject,
+  Injector,
+  OnInit,
+  runInInjectionContext,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoginFormComponent } from './components/login-form/login-form.component';
+import { UserDetailsComponent } from './components/user-details/user-details.component';
+import { AppStore } from './store/app.store';
+import { User } from './models';
+
+import { AuthService } from './services/auth.service';
+import { DynamicHostComponent } from './components/dinamic-host/dinamic-host.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [CommonModule],
-  providers: [], // Remove provideHttpClient here
+  imports: [
+    CommonModule,
+    LoginFormComponent,
+    UserDetailsComponent,
+    DynamicHostComponent,
+  ],
+  providers: [],
 })
 export class AppComponent implements OnInit {
+  store: any;
   data: any = {};
+  user!: User;
 
-  constructor(private apiService: ApiService) {}
-
-  ngOnInit() {
-    console.log('Hello from AppComponent');
-    this.apiService.getData().subscribe((response) => {
-      this.data = response;
-      console.log(this.data);
+  constructor(private authService: AuthService) {
+    this.store = inject(AppStore);
+    const injector = inject(Injector);
+    runInInjectionContext(injector, () => {
+      effect(() => {
+        this.user = this.store.getUser();
+      });
     });
   }
-}
 
-bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient()], // Add provideHttpClient here as well
-});
+  ngOnInit() {
+    if (this.authService.isAuthenticated()) {
+      this.authService.loadUserRelatedData();
+    }
+  }
+
+  logout() {
+    this.store.logout();
+  }
+}

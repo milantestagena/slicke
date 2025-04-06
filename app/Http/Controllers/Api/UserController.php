@@ -55,4 +55,16 @@ class UserController extends Controller
             return $this->error('Update fail', 400, $th->getMessage());
         }
     }
+
+    public function getUserByToken(Request $request)
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+
+        if($user){
+            return $this->success((object)$user);
+        } else {
+            return $this->error("User not found", 400);
+        }
+    }
 }

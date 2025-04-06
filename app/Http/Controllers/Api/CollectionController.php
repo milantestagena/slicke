@@ -24,21 +24,24 @@ class CollectionController extends Controller
         $this->userModel = User::where('id', $this->user->id)->first();
     }
 
-    public function getCollections(){
+    public function getCollections()
+    {
         $data = Collection::getCollections();
         return $this->success(new CollectionsPublic($data));
     }
 
-    public function getAvailableCollections(){
+    public function getAvailableCollections()
+    {
         $data = Collection::getAvailableCollections(Auth::user());
         return $this->success(new CollectionsPublic($data));
     }
 
-    public function setCollectionForUser(int $collectionId){
+    public function setCollectionForUser(int $collectionId)
+    {
         try {
             $ucID = UserCollection::userCollection(Auth::user()->id, $collectionId)->id;
             UserItem::createForUserCollection($ucID, $collectionId);
-            return $this->success(['UserCollectionId' =>  $ucID], 'OK');
+            return $this->success(['UserCollectionId' => $ucID], 'OK');
         } catch (\Throwable $th) {
             throw $th;
             return $this->error('Collection not found', 400, $th);

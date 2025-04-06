@@ -15,12 +15,12 @@ class CollectionCountriesPublic extends JsonResource
     public function toArray($request)
     {
         $ret = [];
-        foreach($this as $data){
-            foreach($data as $model){
-                $ret[] = (object)[
-                    "id"=> $model->id,
-                    "country"=> $model->country,
-                    "region"=> $model->region,
+        foreach ($this as $data) {
+            foreach ($data as $model) {
+                $ret[] = (object) [
+                    "id" => $model->id,
+                    "country" => $model->country,
+                    "region" => $model->region,
                 ];
             }
         }

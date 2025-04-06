@@ -22,11 +22,11 @@ class UserCollectionController extends Controller
 
     public function getCollectionsForUser(){
         $data = UserCollection::userCollections(Auth::user());
-        return $this->success(new CollectionsPublic($data));
+        return $this->success(new UserCollectionPublic($data));
     }
     public function getCollectionForUser(int $collectionId){
         $data = UserCollection::findOrFail($collectionId);
-   
+
         return $this->success(new UserCollectionPublic($data));
     }
     public function updateCollectionForUser($id, UpdateUserCollectionRequest $request){
@@ -40,6 +40,6 @@ class UserCollectionController extends Controller
        } catch (\Throwable $th) {
         return $this->error('Update fail', 400, $th->getMessage());
        }
-       
+
     }
 }
