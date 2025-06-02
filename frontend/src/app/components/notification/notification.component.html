@@ -1,0 +1,7 @@
+<div
+  *ngIf="message() as message"
+  class="notification"
+  [ngClass]="message.type"
+>
+  {{ message.text }}
+</div>

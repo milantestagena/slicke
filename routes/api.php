@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/conversations', 'getConversations');
         Route::get('/conversation/{with}', 'getConversation');
         Route::post('/send_message/{to}', 'sendMessage');
+        Route::post('/send_message_to_username/{to}', 'sendMessageToUsername');
     });
     Route::controller(CollectionController::class)->group(function () {
         Route::get('/collections', 'getCollections');

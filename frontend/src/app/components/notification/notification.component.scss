@@ -1,0 +1,35 @@
+.notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+  max-width: 320px;
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeout 5s forwards;
+  transition: transform 0.2s ease-in-out;
+
+  &.success {
+    background-color: #2e7d32;
+  }
+
+  &.error {
+    background-color: #c62828;
+  }
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

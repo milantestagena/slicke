@@ -30,13 +30,14 @@ class ConversationController extends Controller
         $data = Conversation::getConversation($user, $with);
         $corespondent = User::findOrFail($with);
         return $this->success(
-            (object)[
+            (object) [
                 'conversation' => $data,
                 'corenspondent' => new UserPublicResource($corespondent)
-            ]);
+            ]
+        );
     }
 
-    public function sendMessage(int $to,  StoreConversationRequest $request)
+    public function sendMessage(int $to, StoreConversationRequest $request)
     {
         $user = Auth::user();
         $message = new Conversation;
@@ -52,5 +53,27 @@ class ConversationController extends Controller
             return $this->error('Message not sent', 400, $th);
         }
 
+    }
+
+    public function sendMessageToUsername(string $username, StoreConversationRequest $request)
+    {
+        $user = Auth::user();
+        $recipient = User::where('name', $username)->first();
+
+        if (!$recipient) {
+            return $this->error("User with username '{$username}' not found", 404);
+        }
+
+        $message = new Conversation;
+        $message->sender_id = $user->id;
+        $message->receiver_id = $recipient->id;
+        $message->message = $request->input('message');
+
+        try {
+            $message->save();
+            return $this->success('Message sent');
+        } catch (\Throwable $th) {
+            return $this->error('Message not sent', 400, $th);
+        }
     }
 }

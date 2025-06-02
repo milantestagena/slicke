@@ -10,22 +10,24 @@ import {
 import { CommonModule } from '@angular/common';
 import { LoginFormComponent } from './components/login-form/login-form.component';
 import { UserDetailsComponent } from './components/user-details/user-details.component';
-import { AppStore } from './store/app.store';
-import { User } from './models';
-
-import { AuthService } from './services/auth.service';
 import { DynamicHostComponent } from './components/dinamic-host/dinamic-host.component';
+import { NotificationComponent } from './components/notification/notification.component'; // ⬅️ dodaj
+
+import { AppStore } from './store/app.store';
+import { AuthService } from './services/auth.service';
+import { User } from './models';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     LoginFormComponent,
     UserDetailsComponent,
     DynamicHostComponent,
+    NotificationComponent
   ],
   providers: [],
 })

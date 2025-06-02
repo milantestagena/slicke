@@ -2,9 +2,10 @@
   <!-- Left side: List of users -->
   <div *ngIf="conversations" class="user-list">
     <h3>Mailbox</h3>
+    <a href="#" (click)="showCreateMailForm($event)">Create Mail</a>
     <ul>
       <li
-        *ngFor="let conversation of conversations"
+        *ngFor="let conversation of conversations()"
         (click)="selectUser(conversation)"
       >
         {{
@@ -17,20 +18,25 @@
   </div>
 
   <!-- Right side: Conversation -->
+  <ng-container #formContainer></ng-container>
   <div class="conversation">
-    <div *ngIf="activeConversation">
+    {{ isFormVisible() }}
+    <div *ngIf="!isFormVisible() && activeConversation()">
       <h3>
         Conversation with
         {{ correspondentName }}
       </h3>
       <div
         class="message"
-        *ngFor="
-          let message of conversationsWithUsers[correspondentId]?.conversation
-        "
+        *ngFor="let message of activeConversation()?.conversation"
       >
         <div class="message-header">
-          <span class="sender">From: {{ correspondentName }}</span>
+          <span class="sender">
+            From:
+            {{
+              message.sender_id === user?.id ? "You" : correspondentName
+            }}</span
+          >
           <span class="date"
             >Date: {{ message.created_at | date : "MMM d, y, h:mm a" }}</span
           >
@@ -38,7 +44,7 @@
         <div class="message-body">{{ message.message }}</div>
       </div>
     </div>
-    <div *ngIf="!activeConversation">
+    <div *ngIf="!activeConversation()">
       <p>Select a user to view the conversation.</p>
     </div>
   </div>

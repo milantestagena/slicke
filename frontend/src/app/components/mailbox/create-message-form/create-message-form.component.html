@@ -1,0 +1,23 @@
+<h3>New Message</h3>
+<form (ngSubmit)="submitForm()" #form="ngForm">
+  <div>
+    <label for="recipient">To:</label>
+    <input
+      id="recipient"
+      name="recipient"
+      [(ngModel)]="recipient"
+      required
+    />
+  </div>
+  <div>
+    <label for="message">Message:</label>
+    <textarea
+      id="message"
+      name="message"
+      [(ngModel)]="message"
+      rows="4"
+      required
+    ></textarea>
+  </div>
+  <button type="submit" [disabled]="form.invalid">Send</button>
+</form>

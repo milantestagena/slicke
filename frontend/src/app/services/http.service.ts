@@ -31,5 +31,10 @@ export class HTTPService {
     return this.http.post(`${this.apiUrl}/${requestUrl}`, data, { headers });
   }
 
+  sendMessage(
+    message: string,
+    recipientName: number,
+  ): void {
+  }
 
 }
