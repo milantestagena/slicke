@@ -6,3 +6,6 @@ export type { Collection } from './collection.model';
 export type { CollectionItem } from './collection-item.model';
 export type { Conversation } from './conversation.model';
 export type { ConversationWithUser } from './conversation-with-user';
+export type { CollectionDetails } from './collection-details.model';
+export type { UserCollection } from './user-collection.model';
+export type { UserCollectionItem } from './user-collection-item.model';

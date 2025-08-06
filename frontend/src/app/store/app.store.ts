@@ -1,7 +1,8 @@
 import { signalStore } from '@ngrx/signals';
 import { UserFeature, CountryFeature, MembershipFeature, ConversationsFeature, ConversationWithUserFeature } from './features';
 import { AvailableCollectionsFeature } from './features/available-collections.feature';
-import { UserCollectionsFeature } from './features/user-collections.feature';
+import { UserCollectionsFeature, PublicCollectionsFeature, MatchesFeature } from './features';
+
 
 export const AppStore = signalStore(
   { providedIn: 'root' }, // Makes store injectable
@@ -12,4 +13,6 @@ export const AppStore = signalStore(
   UserCollectionsFeature,
   ConversationsFeature,
   ConversationWithUserFeature,
+  PublicCollectionsFeature,
+  MatchesFeature
 );

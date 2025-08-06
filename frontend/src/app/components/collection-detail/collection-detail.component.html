@@ -1,0 +1,19 @@
+<div class="collection-detail" *ngIf="collection">
+  <h2>{{ collection.collection.name }}</h2>
+  <p class="description">{{ collection.collection.description }}</p>
+  <p><strong>Year:</strong> {{ collection.collection.year }}</p>
+
+  <div class="section" *ngIf="collection.items?.length">
+    <div class="sticker-grid">
+      <app-user-collection-item
+        *ngFor="let ucItem of collection.items"
+        [item]="ucItem"
+        (counterChanged)="onCounterChanged($event)"
+      ></app-user-collection-item>
+    </div>
+
+    <div class="update-bar" *ngIf="hasChanges()">
+      <button (click)="submitUpdate()">Update</button>
+    </div>
+  </div>
+</div>

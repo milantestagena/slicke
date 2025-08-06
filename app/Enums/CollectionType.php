@@ -1,7 +1,7 @@
 <?php
 namespace App\Enums;
 
-enum CollectionType:string {
+enum CollectionType: string {
     case Stickers = 'stickers';
-};
+}
 

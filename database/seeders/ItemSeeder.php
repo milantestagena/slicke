@@ -15,11 +15,6 @@ class ItemSeeder extends Seeder
      */
     public function run()
     {
-        //
-        for($i=1; $i<=125; $i++){
-            Item::factory()->create([
-                'identifier' => $i,
-            ]);
-        }
+        Item::factory()->count(50)->create();
     }
 }

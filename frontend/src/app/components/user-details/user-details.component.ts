@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -10,10 +10,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-details.component.scss'],
 })
 export class UserDetailsComponent {
-  constructor(private router: Router) {}
+  @Output() mailboxClick = new EventEmitter<void>();
+  @Output() logoutClick = new EventEmitter<void>();
+  constructor() {}
 
-  goToMailbox() {
+  openMailbox() {
     // Navigate to the mailbox route
-    this.router.navigate(['/mailbox']);
+    this.mailboxClick.emit();
+  }
+
+  logout() {
+    // Emit an event to notify the parent component to handle logout
+    this.logoutClick.emit();
   }
 }

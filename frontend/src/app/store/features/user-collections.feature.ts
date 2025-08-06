@@ -3,15 +3,24 @@ import {
   withState,
   withMethods,
   patchState,
-  withHooks,
 } from '@ngrx/signals';
-import { Collection } from '../../models';
+import { UserCollection } from '../../models';
 
 export const UserCollectionsFeature = signalStoreFeature(
-  withState<{ UserCollections: Collection[]}>({ UserCollections: [] }),
+  withState<{ userCollections: UserCollection[] }>({ userCollections: [] }),
   withMethods((store) => ({
-    setUserCollections: (UserCollections: any) => patchState(store, { UserCollections: UserCollections }),
-    getUserCollections: () => ({ ...store.UserCollections() }),
-  })),
-);
+    setUserCollections: (collections: UserCollection[]) =>
+      patchState(store, { userCollections: collections }),
 
+    getUserCollections: () => [...store.userCollections()],
+
+    updateUserCollection: (updated: UserCollection) =>
+      patchState(store, {
+        userCollections: store
+          .userCollections()
+          .map((c) => (c.id === updated.id ? updated : c)),
+      }),
+
+    clearUserCollections: () => patchState(store, { userCollections: [] }),
+  }))
+);

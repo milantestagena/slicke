@@ -1,0 +1,53 @@
+.exchange-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: 120px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  background-color: #fefefe;
+  text-align: center;
+  overflow: hidden;
+
+  input[type="checkbox"] {
+    margin-bottom: 0.5rem;
+    transform: scale(1.2);
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    max-height: 100px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+  }
+
+  div {
+    font-size: 0.8rem;
+    word-break: break-word;
+  }
+
+  label div {
+    font-size: 0.75rem;
+    word-break: break-word;
+    line-height: 1.1;
+    max-height: 3.3em; // ~3 linije
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  img {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+}

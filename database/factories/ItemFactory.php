@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ItemFactory extends Factory
 {
+    protected static int $counter = 1;
     /**
      * Define the model's default state.
      *
@@ -18,14 +19,13 @@ class ItemFactory extends Factory
      */
     public function definition()
     {
-        $collectionId = Collection::first()->id;
         return [
             //
-            'collection_id' => $collectionId,
-            'identifier' => fake()->numerify(),
-            'description' => Str::random(256),
-            'link' => Str::random(128),
-            'title' => Str::random(64),
+            'collection_id' => 2,
+            'identifier' => str_pad(self::$counter++, 3, '0', STR_PAD_LEFT),
+            'description' => $this->faker->sentence(8),
+            'link' => 'https://via.placeholder.com/150x200?text=' . $this->faker->unique()->numberBetween(100, 999),
+            'title' => $this->faker->words(2, true),
         ];
     }
 }

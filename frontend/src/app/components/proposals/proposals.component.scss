@@ -1,0 +1,70 @@
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &.active {
+      background: #aaa;
+      font-weight: bold;
+    }
+  }
+}
+
+.proposal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.proposal-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.items-block {
+  display: block;
+  margin-top: 1rem;
+
+  > div {
+    margin-bottom: 1.5rem;
+
+    strong {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.item-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #ccc;
+    }
+  }
+}

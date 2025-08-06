@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { HTTPService } from '../../services/http.service';
 import { catchError, map, of } from 'rxjs';
 import { AppStore } from '../../store/app.store';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-form',
@@ -21,8 +22,8 @@ import { AppStore } from '../../store/app.store';
 export class LoginFormComponent {
   email: string = '';
   password: string = '';
-
   store: any;
+  private authService: AuthService = inject(AuthService);
 
   constructor(private httpService: HTTPService) {
     this.store = inject(AppStore);
@@ -36,12 +37,12 @@ export class LoginFormComponent {
           if (response.data?.user) {
             this.store.setUser(response.data.user);
             localStorage.setItem('authToken', response.data.token);
+            this.authService.loadUserRelatedData();
           } else {
             throw new Error('Invalid credentials');
           }
         }),
         catchError((error) => {
-          console.log('Error:', error);
           return of({});
         })
       )

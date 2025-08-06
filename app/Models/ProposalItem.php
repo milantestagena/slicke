@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProposalItem extends Model
 {
     use HasFactory;
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -17,7 +17,7 @@ class ProposalItem extends Model
     protected $fillable = [
         'proposal_id',
         'user_id',
-        'item_id'
+        'user_item_id'
     ];
 
     /**

@@ -5,3 +5,5 @@ export { AvailableCollectionsFeature } from './available-collections.feature';
 export { ConversationsFeature } from './conversations.feature';
 export { ConversationWithUserFeature } from './conversation-with-user.feature';
 export { UserCollectionsFeature } from './user-collections.feature';
+export { PublicCollectionsFeature } from './public-collections.feature';
+export { MatchesFeature } from './matches.feature';

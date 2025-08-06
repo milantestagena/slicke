@@ -70,29 +70,39 @@ class UserCollection extends Model
 
     public static function getCollectionId($userId, $collectionId)
     {
-        return UserCollection::where('user_id', (int)$userId)->where('collection_id', (int)$collectionId)->first()->id;
+        return UserCollection::where('user_id', (int) $userId)->where('collection_id', (int) $collectionId)->first()->id;
     }
 
-    public static function checkForDoubles($collectionId, $userId, $doubles){
-        $forLogged = Auth::user()->id === $userId;
-
-        foreach($doubles as $id){
-            $double = UserItem::findOrFail($id);
-            if($double->counter <=1){
-                if($forLogged){
-                    $errorMesage = "Some of your items is not duplicate.";
-                } else {
-                    $errorMesage = "Some of items you selected is not duplicate anymore.";
-                }
-                throw new \Exception($errorMesage);
-            }
+    public static function checkForDoubles($collectionId, $userId, $doubles)
+    {
+        $userCollectionId = \DB::table('user_collections')
+            ->where('collection_id', $collectionId)
+            ->where('user_id', $userId)
+            ->value('id');
+        if (!$userCollectionId) {
+            throw new \Exception('User collection not found.');
         }
-        return true;
+
+        $query = \DB::table('user_items')
+            ->whereIn('id', $doubles)
+            ->where('user_collection_id', $userCollectionId)
+            ->where('counter', '<=', 1);
+
+
+        $invalid = $query->pluck('id')->toArray();
+        if (!empty($invalid)) {
+            $forLogged = Auth::id() === $userId;
+            $errorMessage = $forLogged
+                ? 'Some of your items is not duplicate.'
+                : 'Some of items you selected is not duplicate anymore.';
+            throw new \Exception($errorMessage);
+        }
     }
 
-    public function updateItems($items){
-        foreach($items as $key => $value){
-            $ui = UserItem::find((int)$key);
+    public function updateItems($items)
+    {
+        foreach ($items as $key => $value) {
+            $ui = UserItem::find((int) $key);
             $ui->counter = $value;
             $ui->update();
         }
@@ -108,47 +118,66 @@ class UserCollection extends Model
         return $this->hasMany(Missing::class, 'user_collection_id');
     }
 
-    public function deleteDoubles(){
+    public function deleteDoubles()
+    {
         $this->doubles->delete();
     }
 
-    public function deleteMissing(){
+    public function deleteMissing()
+    {
         $this->missing->delete();
     }
 
-    public function deleteDoublesForUser(){
+    public function deleteDoublesForUser()
+    {
         DB::table('doubles')->where('user_id', $this->user->id)->delete();
     }
 
-    public function deleteMissingForUser(){
-        DB::table('missing')->where('user_id',$this->user->id)->delete();
+    public function deleteMissingForUser()
+    {
+        DB::table('missing')->where('user_id', $this->user->id)->delete();
     }
 
-    public function createDoublesForUser(){
+    public function createDoublesForUser()
+    {
         DB::table('doubles')->insertUsing([
-            'user_id', 'collection_id', 'user_collection_id', 'item_id'
+            'user_id',
+            'collection_id',
+            'user_collection_id',
+            'item_id'
         ], DB::table('user_items', )->select(
-            'user_collections.user_id', 'user_collections.collection_id', 'user_items.user_collection_id', 'user_items.item_id'
-        )
-        ->join('user_collections', 'user_collections.id', '=', 'user_items.user_collection_id')
-        ->where('user_collections.id', '=', $this->id)
-        ->where('user_items.counter', '>', 1));
+                'user_collections.user_id',
+                'user_collections.collection_id',
+                'user_items.user_collection_id',
+                'user_items.item_id'
+            )
+                ->join('user_collections', 'user_collections.id', '=', 'user_items.user_collection_id')
+                ->where('user_collections.id', '=', $this->id)
+                ->where('user_items.counter', '>', 1));
     }
 
-    public function createMissingForUser(){
+    public function createMissingForUser()
+    {
         DB::table('missing')->insertUsing([
-            'user_id', 'collection_id', 'user_collection_id', 'item_id'
+            'user_id',
+            'collection_id',
+            'user_collection_id',
+            'item_id'
         ], DB::table('user_items', )->select(
-            'user_collections.user_id', 'user_collections.collection_id', 'user_items.user_collection_id', 'user_items.item_id'
-        )
-        ->join('user_collections', 'user_collections.id', '=', 'user_items.user_collection_id')
-        ->where('user_collections.id', '=', $this->id)
-        ->where('user_items.counter', '=', 0));
+                'user_collections.user_id',
+                'user_collections.collection_id',
+                'user_items.user_collection_id',
+                'user_items.item_id'
+            )
+                ->join('user_collections', 'user_collections.id', '=', 'user_items.user_collection_id')
+                ->where('user_collections.id', '=', $this->id)
+                ->where('user_items.counter', '=', 0));
     }
 
-    public function getFormatedDoubles(){
-        return 
-        DB::select("
+    public function getFormatedDoubles()
+    {
+        return
+            DB::select("
         SELECT
             d.user_id as double_user_id,
             m.user_id as missing_user_id,
@@ -164,11 +193,12 @@ class UserCollection extends Model
         WHERE d.user_collection_id = ?
         GROUP BY m.user_id, d.user_id
         ORDER BY membership_id DESC, to_offer DESC", [$this->id]);
-            
+
 
     }
-    public function getFormatedMissing(){
-        return 
+    public function getFormatedMissing()
+    {
+        return
             DB::select("
                 SELECT
                     d.user_id as double_user_id,
@@ -186,12 +216,13 @@ class UserCollection extends Model
                 GROUP BY m.user_id, d.user_id
                 ORDER BY membership_id DESC, to_offer DESC
             ", [$this->id]);
-        
+
     }
 
-    public function prepareMatchingDataForBatchInsert(){
+    public function prepareMatchingDataForBatchInsert()
+    {
         $data = [];
-        foreach($this->getFormatedDoubles() as $double){
+        foreach ($this->getFormatedDoubles() as $double) {
             $data[$double->missing_user_id] = [
                 'toGiveCount' => $double->to_offer,
                 'toReceiveCount' => 0,
@@ -199,20 +230,20 @@ class UserCollection extends Model
                 'toReceiveIds' => "",
             ];
         }
-        
-        foreach($this->getFormatedMissing() as $missing){
-            if(!$data[$double->missing_user_id]){
+
+        foreach ($this->getFormatedMissing() as $missing) {
+            if (!$data[$double->missing_user_id]) {
                 $data[$double->missing_user_id] = [
                     'toGiveCount' => 0,
                     'toGiveIds' => "",
                 ];
-            } 
+            }
             $data[$double->missing_user_id]['toReceiveCount'] = $missing->to_offer;
             $data[$double->missing_user_id]['toReceiveIds'] = $missing->item_ids;
         }
 
         $dbData = [];
-        foreach($data as $otherUser => $userData){
+        foreach ($data as $otherUser => $userData) {
             $loggedUserIsOlder = $this->user->id < $otherUser;
             $dbData[] = [
                 'collection_id' => $this->collection->id,
@@ -227,7 +258,8 @@ class UserCollection extends Model
         return $dbData;
     }
 
-    public function updateMatchingEntities(){
+    public function updateMatchingEntities()
+    {
         $this->deleteDoublesForUser();
         $this->deleteMissingForUser();
         $this->createDoublesForUser();

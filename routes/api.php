@@ -44,10 +44,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user_collections', 'getCollectionsForUser');
         Route::get('/user_collection/{id}', 'getCollectionForUser');
         Route::put('/user_collection/{id}', 'updateCollectionForUser');
+        Route::post('/user_collection/{id}', 'createCollectionForUser');
     });
     Route::controller(ProposalController::class)->group(function () {
         Route::put('/accept_proposal/{id}', 'acceptProposal');
         Route::put('/refuse_proposal/{id}', 'refuseProposal');
+        Route::get('/get_proposals/{collectionId}', 'getProposals');
         Route::get('/get_proposal/{id}', 'getProposal');
         Route::post('/create_proposal', 'createProposal');
     });

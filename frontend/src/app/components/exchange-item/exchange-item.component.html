@@ -1,0 +1,15 @@
+<div class="exchange-item">
+  <label [for]="'item-' + item.id">
+    <img [src]="item.link" (error)="onImgError($event)"/>
+    <div>
+      <input
+        type="checkbox"
+        [checked]="selected"
+        (change)="onToggleSelection()"
+        [id]="'item-' + item.id"
+      />
+    </div>
+
+    <div>{{ item.identifier }}</div>
+  </label>
+</div>

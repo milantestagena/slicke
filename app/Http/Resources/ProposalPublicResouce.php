@@ -15,19 +15,22 @@ class ProposalPublicResouce extends JsonResource
     public function toArray($request)
     {
         $items = [];
-        foreach($this->items as $item){
-            $items[] = (object)[
-                "id"=> $item->id,
-                "user_id" => $item->user_id, 
-                "user_item"=> (object)[
+        foreach ($this->items as $item) {
+            $items[] = (object) [
+                "id" => $item->id,
+                "user_id" => $item->user_id,
+                "user_item" => (object) [
                     'id' => $item->item->id,
+                    'link' => $item->item->item->link,
                     'identifier' => $item->item->item->identifier,
                     'counter' => $item->item->counter
                 ],
             ];
         }
 
-        $ret = (object)[
+        $ret = (object) [
+            'id' => $this->id,
+            'state' => $this->state,
             'sender' => new UserShortPublicResource($this->sender),
             'receiver' => new UserShortPublicResource($this->receiver),
             'items' => $items

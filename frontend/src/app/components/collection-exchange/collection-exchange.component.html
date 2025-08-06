@@ -1,0 +1,34 @@
+<div class="collection-exchange" *ngIf="exchangeData() as data; else loading">
+  <div class="to-give">
+    <h2>Exchange with {{ data.otherUserName }}</h2>
+    <h3>Your duplicates</h3>
+    <div class="sticker-grid">
+      <app-exchange-item
+        *ngFor="let item of getToGiveItems()"
+        [item]="item.item"
+        [selected]="isSelectedToGive(item.item)"
+        (selectionChange)="onToggleToGive($event)"
+      />
+    </div>
+  </div>
+
+  <div class="to-take">
+    <h3>{{ data.otherUserName }} duplicates</h3>
+    <div class="sticker-grid">
+      <app-exchange-item
+        *ngFor="let item of getToTakeItems()"
+        [item]="item.item"
+        [selected]="isSelectedToTake(item.item)"
+        (selectionChange)="onToggleToTake($event)"
+      />
+    </div>
+  </div>
+
+  <div class="submit">
+    <button (click)="submitExchange()">Submit Exchange</button>
+  </div>
+</div>
+
+<ng-template #loading>
+  <p>Loading...</p>
+</ng-template>

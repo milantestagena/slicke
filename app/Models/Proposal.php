@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Proposal extends Model
 {
     use HasFactory;
-         /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -60,28 +60,38 @@ class Proposal extends Model
         return $this->hasMany(ProposalItem::class, 'proposal_id');
     }
 
-    public function createItems($userId, $items){
-        foreach($items as $item){
+    public function createItems($userId, $items)
+    {
+        //throw new \Exception(json_encode([$this->id, $userId, $items]));
+
+        foreach ($items as $item) {
             ProposalItem::create([
                 'proposal_id' => $this->id,
                 'user_id' => $userId,
-                'item_id' => $item,
+                'user_item_id' => $item,
             ]);
         }
     }
 
-    public function checkIfIsStillActive(){
-        $senderItems = $this->items->where('user_id', '=', $this->sender_id)->pluck('user_item_id');
-        $receiverItems = $this->items->where('user_id', '=', $this->receiver_id)->pluck('user_item_id');
-        UserCollection::checkForDoubles($this->collection_id, $this->sender_id, $senderItems);
-        UserCollection::checkForDoubles($this->collection_id, $this->receiver_id, $receiverItems);
+    public function checkIfIsStillActive()
+    {
+        try {
+            $senderItems = $this->items->where('user_id', '=', $this->sender_id)->pluck('user_item_id');
+            $receiverItems = $this->items->where('user_id', '=', $this->receiver_id)->pluck('user_item_id');
+
+            UserCollection::checkForDoubles($this->collection_id, $this->sender_id, $senderItems);
+            UserCollection::checkForDoubles($this->collection_id, $this->receiver_id, $receiverItems);
+        } catch (\Throwable $e) {
+            throw new \Exception($e->getMessage());
+        }
     }
 
-    public function accept(){
-        foreach($this->items as $item){
+    public function accept()
+    {
+        foreach ($this->items as $item) {
             $isSender = $this->sender_id === $item->user_id;
             $item->item->decrement('counter', 1);
-            if($isSender){
+            if ($isSender) {
                 $userCollection = UserCollection::userCollection($this->receiver_id, $this->collection_id);
             } else {
                 $userCollection = UserCollection::userCollection($this->sender_id, $this->collection_id);

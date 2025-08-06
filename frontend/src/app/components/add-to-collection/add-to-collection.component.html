@@ -1,0 +1,11 @@
+<div class="add-to-collection-form">
+  <label for="collection">Choose a collection:</label>
+  <select id="collection" (change)="selectedCollectionId.set($any($event.target).value)">
+    <option [value]="null">-- Select --</option>
+    <option *ngFor="let col of availableCollections" [value]="col.id">
+      {{ col.name }}
+    </option>
+  </select>
+
+  <button (click)="submit()" [disabled]="!selectedCollectionId()">Submit</button>
+</div>
