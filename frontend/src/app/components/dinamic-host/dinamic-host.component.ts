@@ -25,7 +25,7 @@ export class DynamicHostComponent {
     this.currentComponent = this.container.createComponent(MailboxComponent);
   }
 
-  async loadCollection(collection: UserCollection) {
+  async loadUserCollection(collection: UserCollection) {
     this.container.clear();
     const { CollectionDetailComponent } = await import(
       '../collection-detail/collection-detail.component'
@@ -62,5 +62,16 @@ export class DynamicHostComponent {
     );
     this.currentComponent = this.container.createComponent(ProposalsComponent);
     this.currentComponent.instance.userCollection = collection;
+  }
+
+  async  loadCollection(collection: Collection) {
+    this.container.clear();
+    const { CollectionFormComponentComponent } = await import(
+      '../admin/collection-form-component/collection-form-component.component'
+    );
+    this.currentComponent = this.container.createComponent(CollectionFormComponentComponent);
+    console.log('Loading collection form for:', collection);
+    this.currentComponent.instance.collection = collection;
+
   }
 }

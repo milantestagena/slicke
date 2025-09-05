@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CollectionService } from '../../services/collection.service';
+import { UserCollectionService } from '../../services/user-collection.service';
 import { UserCollection } from '../../models';
 import { AppStore } from '../../store/app.store';
 

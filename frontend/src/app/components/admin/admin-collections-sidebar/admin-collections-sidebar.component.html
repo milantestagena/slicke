@@ -1,0 +1,12 @@
+<div class="sidebar">
+  <h2>Collections</h2>
+  <div
+    *ngFor="let col of collections()"
+    class="collection-item"
+    (click)="selectCollection(col)"
+    [title]="col.link"
+  >
+    <span class="collection-name">{{ col.name }}</span>
+  </div>
+  <button class="add-button" (click)="addNew()">+ Add New</button>
+</div>

@@ -2,6 +2,7 @@ import { signalStore } from '@ngrx/signals';
 import { UserFeature, CountryFeature, MembershipFeature, ConversationsFeature, ConversationWithUserFeature } from './features';
 import { AvailableCollectionsFeature } from './features/available-collections.feature';
 import { UserCollectionsFeature, PublicCollectionsFeature, MatchesFeature } from './features';
+import { CollectionsFeature } from './features/collections.feature';
 
 
 export const AppStore = signalStore(
@@ -14,5 +15,6 @@ export const AppStore = signalStore(
   ConversationsFeature,
   ConversationWithUserFeature,
   PublicCollectionsFeature,
-  MatchesFeature
+  MatchesFeature,
+  CollectionsFeature
 );

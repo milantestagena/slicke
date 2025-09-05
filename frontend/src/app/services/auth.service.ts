@@ -49,5 +49,6 @@ export class AuthService {
   private setUserStore() {
     this.storeService.getAvailableCollections();
     this.storeService.getUserCollections();
+    this.storeService.getAllCollections();
   }
 }

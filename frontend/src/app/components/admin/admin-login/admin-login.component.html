@@ -1,0 +1,17 @@
+<div class="login-wrapper">
+  <h2>Admin Login</h2>
+  <form (ngSubmit)="login()">
+    <label>
+      Username:
+      <input type="text" [(ngModel)]="username" name="username" />
+    </label>
+
+    <label>
+      Password:
+      <input type="password" [(ngModel)]="password" name="password" />
+    </label>
+
+    <button type="submit">Login</button>
+  </form>
+  <div *ngIf="error" class="error">{{ error }}</div>
+</div>

@@ -1,4 +1,4 @@
-import { CollectionItem, UserCollectionItem } from './';
+import { UserCollectionItem } from './';
 import { CollectionDetails } from './';
 
 export interface UserCollection {

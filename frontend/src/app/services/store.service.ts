@@ -68,6 +68,29 @@ export class StoreService {
       .subscribe();
   }
 
+  getAllCollections() {
+    this.httpService
+      .getRequestWithAuth(GetUrls.GET_COLLECTIONS)
+      .pipe(
+        map((response: any) => {
+          console.log('All collections response:', response);
+          if (response.data) {
+            console.log('Setting collections in store', response, response.data);
+            console.log('store instance in StoreService', this.store);
+            this.store.setCollections(response.data);
+          } else {
+            throw new Error('Invalid credentials');
+          }
+        }),
+        catchError((error) => {
+          console.error('Error fetching all collections:', error);
+          return of({});
+        }),
+        take(1)
+      )
+      .subscribe();
+  }
+
   getConversations() {
     this.httpService
       .getRequestWithAuth(GetUrls.GET_CONVERSATIONS)

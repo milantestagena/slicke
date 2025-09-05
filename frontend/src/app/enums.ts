@@ -6,6 +6,7 @@ export enum GetUrls {
   GET_USER_COLLECTIONS = 'user_collections',
   GET_CONVERSATIONS = 'conversations',
   GET_CONVERSATION_WITH_USER = 'conversation',
+  GET_COLLECTIONS = 'collections',
 }
 
 export enum PostUrls {

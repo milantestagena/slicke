@@ -44,7 +44,45 @@ class CollectionController extends Controller
             return $this->success(['UserCollectionId' => $ucID], 'OK');
         } catch (\Throwable $th) {
             throw $th;
-            return $this->error('Collection not found', 400, $th);
         }
     }
+
+    public function create(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+            'link' => 'nullable|string',
+            'year' => 'nullable|integer',
+            'items' => 'array',
+            'countries' => 'array',
+        ]);
+
+        $collection = Collection::create($validated);
+
+        // TODO: save related items and countries if needed
+        return response()->json($collection);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $collection = Collection::findOrFail($id);
+
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+            'link' => 'nullable|string',
+            'year' => 'nullable|integer',
+            'items' => 'array',
+            'countries' => 'array',
+        ]);
+
+        $collection->update($validated);
+
+        // TODO: update related items and countries if needed
+        return response()->json($collection);
+    }
+
 }

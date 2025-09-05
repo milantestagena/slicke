@@ -1,43 +1,12 @@
-import { Injectable, inject } from '@angular/core';
-import { HTTPService } from './http.service';
-import { NotificationService } from './notification.service';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Collection } from '../models/collection.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class CollectionService {
-  private http = inject(HTTPService);
-  private notification = inject(NotificationService);
+  constructor(private http: HttpClient) {}
 
-  getAllAvailableCollections() {
-    return this.http.getRequest('available_collections');
-  }
-
-  getUserCollections() {
-    return this.http.getRequestWithAuth('user_collections');
-  }
-
-  getUserCollectionById(id: number | string) {
-    return this.http.getRequestWithAuth(`user_collection/${id}`);
-  }
-
-  updateUserCollection(id: number | string, data: any) {
-    return this.http.putRequestWithAuth(`user_collection/${id}`, data);
-  }
-
-  createUserCollection(id: number) {
-    return this.http.postRequestWithAuth(`user_collection/${id}`, null);
-  }
-
-  updateCollectionWithFeedback(id: number | string, data: any) {
-    this.updateUserCollection(id, data).subscribe({
-      next: () => {
-        this.notification.show('success', 'Collection updated successfully');
-      },
-      error: (err) => {
-        this.notification.show('error', 'Failed to update collection');
-        console.error(err);
-      },
-    });
+  getAllCollections() {
+    return this.http.get<Collection[]>('/api/collections').toPromise();
   }
 }
