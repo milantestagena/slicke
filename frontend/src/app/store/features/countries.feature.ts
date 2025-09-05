@@ -16,7 +16,7 @@ export const CountryFeature = signalStoreFeature(
   withMethods((store) => ({
     setCountries: (countries: Country[]) =>
       patchState(store, { Countries: countries }),
-    getCountries: () => ({ ...store.Countries() })
+    getCountries: () => (store.Countries())
   })),
   withHooks((store) => ({
     onInit() {

@@ -2,7 +2,7 @@ import { Component, inject, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Collection, UserCollection } from '../../models';
 import { AppStore } from '../../store/app.store';
-import { CollectionService } from '../../services/collection.service';
+import { UserCollectionService } from '../../services/user-collection.service';
 import { tap, catchError, of, finalize } from 'rxjs';
 import { StoreService } from '../../services/store.service';
 
@@ -15,7 +15,7 @@ import { StoreService } from '../../services/store.service';
 })
 export class AddToCollectionComponent {
   storeService = inject(StoreService);
-  collectionService = inject(CollectionService);
+  collectionService = inject(UserCollectionService);
   store = inject(AppStore);
   userCollections: UserCollection[];
   availableCollections: Collection[];

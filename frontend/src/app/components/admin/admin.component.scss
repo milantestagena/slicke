@@ -1,0 +1,17 @@
+.admin-layout {
+  display: flex;
+  height: 100vh; // koristi celu visinu ekrana
+  width: 100%;
+}
+
+app-admin-collections-sidebar {
+  width: 250px; // ili koliko ti treba
+  background-color: #f5f5f5; // opcionalno
+  border-right: 1px solid #ccc;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}

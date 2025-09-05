@@ -1,0 +1,18 @@
+<ng-container *ngIf="isLoggedIn; else login">
+  <div class="admin-layout">
+    <app-admin-collections-sidebar
+      (collectionSelected)="onCollectionSelected($event)"
+      (addCollectionRequested)="onAddCollectionRequested()"
+    >
+    </app-admin-collections-sidebar>
+
+    <div class="content-area">
+      <!-- Main content area -->
+      <app-dynamic-host></app-dynamic-host>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #login>
+  <app-admin-login />
+</ng-template>

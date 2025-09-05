@@ -1,0 +1,41 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+  <label>
+    Name:
+    <input type="text" formControlName="name" />
+  </label>
+
+  <label>
+    Type:
+    <input type="text" formControlName="type" />
+  </label>
+
+  <label>
+    Year:
+    <input type="number" formControlName="year" />
+  </label>
+
+  <fieldset formGroupName="countries">
+    <legend>Countries:</legend>
+    <label *ngFor="let country of countries">
+      <input type="checkbox" [formControlName]="country.id" />
+      {{ country.country }}
+    </label>
+  </fieldset>
+
+  <label>
+    How many items this collection has:
+    <input type="number" formControlName="itemsCount" />
+  </label>
+
+  <div formArrayName="items">
+    <div *ngFor="let item of items?.controls; let i = index" [formGroupName]="i">
+      <h4>Item #{{ i + 1 }}</h4>
+      <label>Title: <input formControlName="title" /></label>
+      <label>Description: <input formControlName="description" /></label>
+      <label>Link: <input formControlName="link" /></label>
+      <label>Identifier: <input formControlName="identifier" /></label>
+    </div>
+  </div>
+
+  <button type="submit">Save Collection</button>
+</form>

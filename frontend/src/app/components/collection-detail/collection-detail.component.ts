@@ -10,7 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { UserCollection } from '../../models';
 import { UserCollectionItemComponent } from '../user-collection-item/user-collection-item.component';
-import { CollectionService } from '../../services/collection.service';
+import { UserCollectionService } from '../../services/user-collection.service';
 import { NotificationService } from '../../services/notification.service';
 @Component({
   selector: 'app-collection-detail',
@@ -22,7 +22,7 @@ import { NotificationService } from '../../services/notification.service';
 export class CollectionDetailComponent {
   @Input() collection!: UserCollection;
 
-  collectionService = inject(CollectionService);
+  collectionService = inject(UserCollectionService);
   notificationService = inject(NotificationService);
 
   currentCounters: WritableSignal<Record<number, number>> = signal({});
