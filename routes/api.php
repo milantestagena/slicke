@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/select_collection/{id}', 'setCollectionForUser');
         Route::post('/collections', 'create');
         Route::put('/collections/{id}', 'update');
+        Route::put('/collections/update_many', 'updateMany');
     });
     Route::controller(UserCollectionController::class)->group(function () {
         Route::get('/user_collections', 'getCollectionsForUser');

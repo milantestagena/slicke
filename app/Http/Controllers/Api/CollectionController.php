@@ -85,4 +85,28 @@ class CollectionController extends Controller
         return response()->json($collection);
     }
 
+    public function updateMany(Request $request)
+    {
+        $validated = $request->validate([
+            'collections' => 'required|array',
+            'collections.*.id' => 'required|integer|exists:collections,id',
+            'collections.*.type' => 'required|string',
+            'collections.*.name' => 'required|string',
+            'collections.*.description' => 'nullable|string',
+            'collections.*.link' => 'nullable|string',
+            'collections.*.year' => 'nullable|integer',
+            'collections.*.items' => 'array',
+            'collections.*.countries' => 'array',
+        ]);
+
+        $updated = [];
+        foreach ($validated['collections'] as $colData) {
+            $collection = Collection::findOrFail($colData['id']);
+            $collection->update($colData);
+            // TODO: update related items and countries if needed
+            $updated[] = $collection;
+        }
+
+        return response()->json($updated);
+    }
 }
