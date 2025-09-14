@@ -1,31 +1,43 @@
 .sidebar {
-  width: 220px;
-  background: #f4f4f4;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px;
+}
 
-  .collection-item {
-    cursor: pointer;
-    padding: 4px 8px;
-    transition: background 0.2s ease;
+.collection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
-    &:hover {
-      background: #f2f2f2;
-    }
+.collection-item:hover {
+  background: #f8fafc;
+}
 
-    .collection-name {
-      text-decoration: underline;
-    }
-  }
-  .add-button {
-    margin-top: 120px;
-    padding: 8px;
-    background: #ddd;
-    cursor: pointer;
-    text-align: center;
-    font-weight: bold;
+.collection-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
 
-    &:hover {
-      background: #ccc;
-    }
-  }
+.delete {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.delete:hover {
+  background: #fee2e2;
 }

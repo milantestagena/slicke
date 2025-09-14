@@ -26,7 +26,7 @@ export class AddToCollectionComponent {
     const userCollectionIds = this.userCollections.map((c) => c.collection.id);
     this.availableCollections = this.store.AvailableCollections().filter(
       (collection) => {
-        return !userCollectionIds.includes(collection.id)
+        return !userCollectionIds.includes(collection.id as number);
       }
     );
   }

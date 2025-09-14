@@ -2,16 +2,21 @@ import { inject, Injectable } from '@angular/core';
 import { AppStore } from '../store/app.store';
 import { HTTPService } from './http.service';
 import { GetUrls } from '../enums';
-import { catchError, map, of, take } from 'rxjs';
+import { catchError, EMPTY, map, of, take, tap } from 'rxjs';
+import { Collection } from '../models';
+import { CollectionService } from './collection.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StoreService {
   store: any;
-
-  constructor(private httpService: HTTPService) {
+  private httpService: HTTPService;
+  private collectionService: CollectionService;
+  constructor() {
     this.store = inject(AppStore);
+    this.httpService = inject(HTTPService);
+    this.collectionService = inject(CollectionService);
   }
 
   setUserFromSession(token: string) {
@@ -22,8 +27,7 @@ export class StoreService {
           if (response.data) {
             this.store.setUser(response.data);
           }
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }
@@ -38,12 +42,7 @@ export class StoreService {
           } else {
             throw new Error('Invalid credentials');
           }
-        }),
-        catchError((error) => {
-          console.log('Error:', error);
-          return of({});
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }
@@ -58,35 +57,32 @@ export class StoreService {
           } else {
             throw new Error('Invalid credentials');
           }
-        }),
-        catchError((error) => {
-          console.log('Error:', error);
-          return of({});
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }
 
   getAllCollections() {
-    this.httpService
-      .getRequestWithAuth(GetUrls.GET_COLLECTIONS)
-      .pipe(
-        map((response: any) => {
-          console.log('All collections response:', response);
-          if (response.data) {
-            console.log('Setting collections in store', response, response.data);
-            console.log('store instance in StoreService', this.store);
-            this.store.setCollections(response.data);
-          } else {
-            throw new Error('Invalid credentials');
-          }
-        }),
-        catchError((error) => {
-          console.error('Error fetching all collections:', error);
-          return of({});
-        }),
-        take(1)
+    this.collectionService.getAllCollections().pipe(
+        map((r: { data: Collection[] }) => r.data),
+        tap((list) => this.store.setCollections(list)),
+        catchError(() => EMPTY)
+      )
+      .subscribe();
+  }
+
+  saveCollection(collection: Collection) {
+    console.log('Saving collection:', collection);
+    this.collectionService.saveCollection(collection).pipe(
+        tap(() => this.getAllCollections()),
+        catchError(() => EMPTY)
+      )
+      .subscribe();
+  }
+  deleteCollection(id: number) {
+    this.collectionService.deleteCollection(id).pipe(
+        tap(() => this.getAllCollections()),
+        catchError(() => EMPTY)
       )
       .subscribe();
   }
@@ -101,12 +97,7 @@ export class StoreService {
           } else {
             throw new Error('Invalid credentials');
           }
-        }),
-        catchError((error) => {
-          console.log('Error:', error);
-          return of({});
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }
@@ -122,12 +113,7 @@ export class StoreService {
           } else {
             throw new Error('Invalid credentials');
           }
-        }),
-        catchError((error) => {
-          console.log('Error:', error);
-          return of({});
-        }),
-        take(1)
+        })
       )
       .subscribe();
   }

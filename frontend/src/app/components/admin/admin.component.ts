@@ -59,6 +59,6 @@ export class AdminComponent implements OnInit {
   }
 
   onAddCollectionRequested() {
-    // Prikaz forme za novu kolekciju
+    this.dynamicHost.createCollection();
   }
 }

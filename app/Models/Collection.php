@@ -22,6 +22,7 @@ class Collection extends Model
         'name',
         'description',
         'year',
+        'link'
     ];
 
     /**

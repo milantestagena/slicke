@@ -1,41 +1,77 @@
-<form [formGroup]="form" (ngSubmit)="save()">
-  <label>
-    Name:
-    <input type="text" formControlName="name" />
-  </label>
-
-  <label>
-    Type:
-    <input type="text" formControlName="type" />
-  </label>
-
-  <label>
-    Year:
-    <input type="number" formControlName="year" />
-  </label>
-
-  <fieldset formGroupName="countries">
-    <legend>Countries:</legend>
-    <label *ngFor="let country of countries">
-      <input type="checkbox" [formControlName]="country.id" />
-      {{ country.country }}
+<form class="collection-form" [formGroup]="form" (ngSubmit)="save()">
+  <div class="section">
+    <label class="field">
+      <span class="label">Name</span>
+      <input type="text" formControlName="name" />
     </label>
+
+    <label class="field">
+      <span class="label">Type</span>
+      <input type="text" formControlName="type" />
+    </label>
+
+    <label class="field">
+      <span class="label">Year</span>
+      <input type="number" formControlName="year" />
+    </label>
+
+    <label class="field">
+      <span class="label">Description</span>
+      <input type="text" formControlName="description" />
+    </label>
+
+    <label class="field">
+      <span class="label">Link</span>
+      <input type="text" formControlName="link" />
+    </label>
+  </div>
+
+  <fieldset class="section countries" formGroupName="countries">
+    <legend>Countries</legend>
+    <div class="country-grid">
+      <label class="country" *ngFor="let country of countries">
+        <input type="checkbox" [formControlName]="country.id" />
+        <span>{{ country.country }}</span>
+      </label>
+    </div>
   </fieldset>
 
-  <label>
-    How many items this collection has:
-    <input type="number" formControlName="itemsCount" />
-  </label>
+  <div class="section items-head">
+    <label class="field inline">
+      <span class="label">How many items this collection has</span>
+      <input type="number" formControlName="itemsCount" />
+    </label>
+  </div>
 
-  <div formArrayName="items">
-    <div *ngFor="let item of items?.controls; let i = index" [formGroupName]="i">
-      <h4>Item #{{ i + 1 }}</h4>
-      <label>Title: <input formControlName="title" /></label>
-      <label>Description: <input formControlName="description" /></label>
-      <label>Link: <input formControlName="link" /></label>
-      <label>Identifier: <input formControlName="identifier" /></label>
+  <div class="items" formArrayName="items">
+    <div class="item-card" *ngFor="let item of items?.controls; let i = index" [formGroupName]="i">
+      <div class="item-title">Item #{{ i + 1 }}</div>
+
+      <div class="item-grid">
+        <label class="field">
+          <span class="label">Title</span>
+          <input formControlName="title" />
+        </label>
+
+        <label class="field">
+          <span class="label">Identifier</span>
+          <input formControlName="identifier" />
+        </label>
+
+        <label class="field">
+          <span class="label">Description</span>
+          <input formControlName="description" />
+        </label>
+
+        <label class="field">
+          <span class="label">Link</span>
+          <input formControlName="link" />
+        </label>
+      </div>
     </div>
   </div>
 
-  <button type="submit">Save Collection</button>
+  <div class="actions">
+    <button type="submit">Save Collection</button>
+  </div>
 </form>

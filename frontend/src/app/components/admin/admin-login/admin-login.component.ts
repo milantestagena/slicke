@@ -20,7 +20,6 @@ export class AdminLoginComponent {
   login() {
 
     if (this.username === 'admin' && this.password === 'admin') {
-          console.log('Login attempt:', this.username, this.password);
       const now = new Date();
       const expires = now.getTime() + 24 * 60 * 60 * 1000; // 1 dan
       localStorage.setItem('admin_token', expires.toString());

@@ -3,11 +3,6 @@ import {
   Input,
   inject,
   OnInit,
-  computed,
-  effect,
-  signal,
-  runInInjectionContext,
-  EnvironmentInjector,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -16,11 +11,12 @@ import {
   FormGroup,
   FormArray,
 } from '@angular/forms';
-import { CountryFeature } from '../../../store/features/countries.feature';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { CountryService } from '../../../services/country.service';
 import { AppStore } from '../../../store/app.store';
-import { Collection, Country } from '../../../models';
+import { Collection, CollectionItem, Country } from '../../../models';
+import { CollectionService } from '../../../services/collection.service';
+import { StoreService } from '../../../services/store.service';
+
+type Mode = 'create' | 'edit';
 
 @Component({
   selector: 'app-admin-collection-form',
@@ -32,9 +28,14 @@ import { Collection, Country } from '../../../models';
 export class CollectionFormComponentComponent implements OnInit {
   store: any;
   countries!: Country[];
+  collectionService: CollectionService;
+  storeService: StoreService;
   constructor() {
     this.store = inject(AppStore);
+    this.storeService = inject(StoreService);
+    this.collectionService = inject(CollectionService);
   }
+  @Input() mode: Mode = 'edit';
   @Input() collection?: Collection;
 
   private fb = inject(FormBuilder);
@@ -43,6 +44,8 @@ export class CollectionFormComponentComponent implements OnInit {
     name: [''],
     type: [''],
     year: [new Date().getFullYear()],
+    description: [''],
+    link: [''],
     countries: this.fb.group({}),
     itemsCount: [0],
     items: this.fb.array([]),
@@ -66,6 +69,7 @@ export class CollectionFormComponentComponent implements OnInit {
 
   private initCountriesCheck() {
     this.countries = this.store.getCountries();
+    console.log('Available countries:', this.countries);
     const group: { [key: string]: any } = {};
     this.countries.forEach((country) => {
       group[country.id] = [false];
@@ -92,20 +96,26 @@ export class CollectionFormComponentComponent implements OnInit {
 
   save() {
     const raw = this.form.getRawValue();
+    console.log('Form raw value:', raw);
     const selectedCountries = Object.entries(raw.countries)
       .filter(([_, checked]) => checked)
-      .map(([id]) => parseInt(id, 10));
+      .map(([id]) => parseInt(id, 10)) as unknown as Country[];
 
-    const result = {
-      name: raw.name,
-      type: raw.type,
-      year: raw.year,
-      countries: selectedCountries,
-      items: raw.items,
+    const result: Collection = {
+      name: raw.name as string,
+      type: raw.type as string,
+      year: raw.year as number,
+      description: raw.description as string,
+      link: raw.link as string,
+      countries: selectedCountries as Country[],
+      items: raw.items as CollectionItem[],
     };
+    if(this.mode === 'edit') {
+      result.id = this.collection?.id;
+    }
 
-    console.log('Final payload:', result);
-    // kasnije: this.storeService.saveCollection(result)
+
+    this.storeService.saveCollection(result);
   }
 
   patchFormFromCollection(collection: Collection) {
@@ -113,6 +123,8 @@ export class CollectionFormComponentComponent implements OnInit {
       name: collection.name,
       type: collection.type,
       year: collection.year,
+      description: collection.description,
+      link: collection.link,
       itemsCount: collection.items.length,
     });
 

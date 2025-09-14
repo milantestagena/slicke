@@ -1,0 +1,122 @@
+.collection-form {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 16px;
+
+  .section {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      color: #334155;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 3px rgba(148,163,184,.2);
+    }
+
+    &.inline {
+      grid-auto-flow: column;
+      align-items: center;
+      grid-template-columns: 1fr 220px;
+      gap: 16px;
+      max-width: 520px;
+    }
+  }
+
+  fieldset.countries {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .country-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 14px;
+
+    @media (max-width: 1200px) { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 900px) { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 480px) { grid-template-columns: 1fr; }
+  }
+
+  .country {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .items {
+    display: grid;
+    gap: 16px;
+  }
+
+  .item-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    background: #fff;
+    box-shadow:
+      0 1px 1px rgba(0,0,0,.02),
+      0 2px 8px rgba(15,23,42,.03);
+
+    .item-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0f172a;
+    }
+
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+
+      @media (max-width: 680px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #0ea5e9;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:active { transform: translateY(1px); }
+  }
+}

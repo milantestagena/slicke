@@ -26,7 +26,6 @@ export class CountryService {
           }
         }),
         catchError((error) => {
-          console.log('Error:', error);
           return of({});
         }),
         take(1)

@@ -54,7 +54,6 @@ export class ProposalsComponent {
             ),
           };
           this.loading = false;
-          console.log('Proposals loaded:', this.proposals, this.formattedProposals);
         },
         error: () => {
           this.loading = false;

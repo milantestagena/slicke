@@ -1,7 +1,7 @@
 import { CollectionItem , Country } from "./";
 
 export interface Collection {
-  id: number;
+  id?: number;
   type: string;
   name: string;
   description: string;

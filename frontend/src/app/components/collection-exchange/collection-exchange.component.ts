@@ -40,7 +40,6 @@ export class CollectionExchangeComponent {
       const item = this.itemMap.get(id.toString());
       return item;
     });
-    console.log(this.exchangeData());
     return mapped as UserCollectionItem[];
   }
 

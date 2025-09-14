@@ -39,7 +39,6 @@ export const MatchesFeature = signalStoreFeature(
       });
 
       matchesService.getExchangeForCollection(collectionId, (data) => {
-        console.log('Exchange data loaded:', data);
         patchState(store, {
           exchangeData: data,
           loading: false,

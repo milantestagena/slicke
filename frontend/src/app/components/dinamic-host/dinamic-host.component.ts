@@ -70,8 +70,16 @@ export class DynamicHostComponent {
       '../admin/collection-form-component/collection-form-component.component'
     );
     this.currentComponent = this.container.createComponent(CollectionFormComponentComponent);
-    console.log('Loading collection form for:', collection);
+    this.currentComponent.instance.mode =  'edit';
     this.currentComponent.instance.collection = collection;
+  }
 
+  async createCollection() {
+    this.container.clear();
+    const { CollectionFormComponentComponent } = await import(
+      '../admin/collection-form-component/collection-form-component.component'
+    );
+    this.currentComponent = this.container.createComponent(CollectionFormComponentComponent);
+    this.currentComponent.instance.mode =  'create';
   }
 }

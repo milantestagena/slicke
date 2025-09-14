@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { NotificationService } from './notification.service';
 
 @Injectable({
@@ -47,6 +47,16 @@ export class HTTPService {
     return this.http.put(`${this.apiUrl}/${requestUrl}`, data, { headers });
   }
 
+  deleteRequest(requestUrl: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${requestUrl}`);
+  }
+
+  deleteRequestWithAuth(requestUrl: string): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete(`${this.apiUrl}/${requestUrl}`, { headers });
+  }
+
   requestWithNotification<T>(
     method: 'get' | 'post' | 'put',
     requestUrl: string,
@@ -56,31 +66,36 @@ export class HTTPService {
     errorMessage?: string
   ): Observable<T> {
     let request;
-    if(withAuth) {
-      request = method === 'get'
-      ? this.getRequestWithAuth(requestUrl)
-      : method === 'post'
-      ? this.postRequestWithAuth(requestUrl, data)
-      : this.putRequestWithAuth(requestUrl, data);
+    if (withAuth) {
+      request =
+        method === 'get'
+          ? this.getRequestWithAuth(requestUrl)
+          : method === 'post'
+          ? this.postRequestWithAuth(requestUrl, data)
+          : this.putRequestWithAuth(requestUrl, data);
     } else {
-      request = method === 'get'
-      ? this.getRequest(requestUrl)
-      : method === 'post'
-      ? this.postRequest(requestUrl, data)
-      : this.putRequest(requestUrl, data);
+      request =
+        method === 'get'
+          ? this.getRequest(requestUrl)
+          : method === 'post'
+          ? this.postRequest(requestUrl, data)
+          : this.putRequest(requestUrl, data);
     }
 
     return request.pipe(
       tap({
         next: () => {
-          this.notification.show('success', successMessage || 'Request successful');
+          this.notification.show(
+            'success',
+            successMessage || 'Request successful'
+          );
         },
         error: () => {
           this.notification.show('error', errorMessage || 'An error occurred');
         },
       })
     );
-  };
+  }
 
   sendMessage(message: string, recipientName: number): void {}
 }

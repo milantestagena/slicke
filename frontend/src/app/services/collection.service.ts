@@ -1,12 +1,29 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Collection } from '../models/collection.model';
+import { HTTPService } from './http.service';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionService {
-  constructor(private http: HttpClient) {}
+  httpService: HTTPService;
+  constructor() {
+    this.httpService = inject(HTTPService);
+  }
 
   getAllCollections() {
-    return this.http.get<Collection[]>('/api/collections').toPromise();
+    return this.httpService.getRequestWithAuth('collections');
+  }
+
+  deleteCollection(id: number) {
+    return this.httpService.deleteRequestWithAuth(`collections/${id}`);
+  }
+
+  saveCollection(collection: Collection) {
+    if (collection.id) {
+      return this.httpService
+        .putRequestWithAuth(`collections/${collection.id}`, collection);
+    } else {
+      return this.httpService
+        .postRequestWithAuth('collections', collection);
+    }
   }
 }
