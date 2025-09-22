@@ -3,6 +3,9 @@ import {
   ViewChild,
   ViewContainerRef,
   ComponentRef,
+  DestroyRef,
+  Type,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Collection, UserCollection } from '../../models';
@@ -17,69 +20,79 @@ export class DynamicHostComponent {
   @ViewChild('container', { read: ViewContainerRef })
   container!: ViewContainerRef;
 
-  private currentComponent: ComponentRef<any> | null = null;
+  private readonly destroyRef = inject(DestroyRef);
+  private currentComponent: ComponentRef<unknown> | null = null;
+
+  private async loadComponent<T>(
+    resolver: () => Promise<Type<T>>,
+  ): Promise<ComponentRef<T>> {
+    this.container.clear();
+    this.currentComponent?.destroy();
+
+    const componentType = await resolver();
+    const componentRef = this.container.createComponent(componentType);
+    this.destroyRef.onDestroy(() => componentRef.destroy());
+    this.currentComponent = componentRef;
+    return componentRef;
+  }
 
   async loadMailbox() {
-    this.container.clear();
-    const { MailboxComponent } = await import('../mailbox/mailbox.component');
-    this.currentComponent = this.container.createComponent(MailboxComponent);
+    await this.loadComponent(() =>
+      import('../mailbox/mailbox.component').then((m) => m.MailboxComponent),
+    );
   }
 
   async loadUserCollection(collection: UserCollection) {
-    this.container.clear();
-    const { CollectionDetailComponent } = await import(
-      '../collection-detail/collection-detail.component'
+    const componentRef = await this.loadComponent(() =>
+      import('../collection-detail/collection-detail.component').then(
+        (m) => m.CollectionDetailComponent,
+      ),
     );
-    this.currentComponent = this.container.createComponent(
-      CollectionDetailComponent
-    );
-    this.currentComponent.instance.collection = collection;
+    componentRef.instance.collection = collection;
   }
 
   async loadAddToCollectionComponent() {
-    this.container.clear();
-    const { AddToCollectionComponent } = await import(
-      '../add-to-collection/add-to-collection.component'
+    await this.loadComponent(() =>
+      import('../add-to-collection/add-to-collection.component').then(
+        (m) => m.AddToCollectionComponent,
+      ),
     );
-    this.container.createComponent(AddToCollectionComponent);
   }
 
   async loadExchange(collection: UserCollection) {
-    this.container.clear();
-    const { CollectionExchangeComponent } = await import(
-      '../collection-exchange/collection-exchange.component'
+    const componentRef = await this.loadComponent(() =>
+      import('../collection-exchange/collection-exchange.component').then(
+        (m) => m.CollectionExchangeComponent,
+      ),
     );
-    this.currentComponent = this.container.createComponent(
-      CollectionExchangeComponent
-    );
-    this.currentComponent.instance.collection = collection;
+    componentRef.instance.collection = collection;
   }
 
   async loadProposals(collection: UserCollection) {
-    this.container.clear();
-    const { ProposalsComponent } = await import(
-      '../proposals/proposals.component'
+    const componentRef = await this.loadComponent(() =>
+      import('../proposals/proposals.component').then(
+        (m) => m.ProposalsComponent,
+      ),
     );
-    this.currentComponent = this.container.createComponent(ProposalsComponent);
-    this.currentComponent.instance.userCollection = collection;
+    componentRef.setInput("userCollection", collection);
   }
 
-  async  loadCollection(collection: Collection) {
-    this.container.clear();
-    const { CollectionFormComponentComponent } = await import(
-      '../admin/collection-form-component/collection-form-component.component'
+  async loadCollection(collection: Collection) {
+    const componentRef = await this.loadComponent(() =>
+      import('../admin/collection-form-component/collection-form-component.component').then(
+        (m) => m.CollectionFormComponentComponent,
+      ),
     );
-    this.currentComponent = this.container.createComponent(CollectionFormComponentComponent);
-    this.currentComponent.instance.mode =  'edit';
-    this.currentComponent.instance.collection = collection;
+    componentRef.instance.mode = 'edit';
+    componentRef.instance.collection = collection;
   }
 
   async createCollection() {
-    this.container.clear();
-    const { CollectionFormComponentComponent } = await import(
-      '../admin/collection-form-component/collection-form-component.component'
+    const componentRef = await this.loadComponent(() =>
+      import('../admin/collection-form-component/collection-form-component.component').then(
+        (m) => m.CollectionFormComponentComponent,
+      ),
     );
-    this.currentComponent = this.container.createComponent(CollectionFormComponentComponent);
-    this.currentComponent.instance.mode =  'create';
+    componentRef.instance.mode = 'create';
   }
 }

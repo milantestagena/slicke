@@ -10,3 +10,7 @@ export interface Collection {
   items: CollectionItem[];
   countries: Country[];
 }
+
+export type CollectionPayload = Omit<Collection, 'countries'> & {
+  countries: number[];
+};

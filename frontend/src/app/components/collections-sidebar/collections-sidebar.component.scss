@@ -11,9 +11,21 @@
     list-style: none;
     padding-left: 0;
 
+    li {
+      padding: 0.3rem 0;
+    }
+
     .collection-header {
       cursor: pointer;
       font-weight: bold;
+
+      span {
+        color: #007acc;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .sub-listing {
@@ -22,18 +34,21 @@
 
       li {
         cursor: pointer;
-        padding: 0.25rem 0;
+
+        span {
+          color: #007acc;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
     }
+  }
+}
 
-    li {
-      padding: 0.3rem 0;
-      cursor: pointer;
-      color: #007acc;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+.action-bar {
+  button {
+    cursor: pointer;
   }
 }

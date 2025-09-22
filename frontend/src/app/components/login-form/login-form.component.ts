@@ -1,10 +1,4 @@
-import {
-  Component,
-  effect,
-  inject,
-  Injector,
-  runInInjectionContext,
-} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HTTPService } from '../../services/http.service';
@@ -20,31 +14,28 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule],
 })
 export class LoginFormComponent {
-  email: string = '';
-  password: string = '';
-  store: any;
-  private authService: AuthService = inject(AuthService);
+  email = '';
+  password = '';
 
-  constructor(private httpService: HTTPService) {
-    this.store = inject(AppStore);
-  }
+  private readonly store = inject(AppStore);
+  private readonly httpService = inject(HTTPService);
+  private readonly authService = inject(AuthService);
 
   onSubmit() {
     this.httpService
       .postRequest('login', { email: this.email, password: this.password })
       .pipe(
         map((response: any) => {
-          if (response.data?.user) {
-            this.store.setUser(response.data.user);
-            localStorage.setItem('authToken', response.data.token);
-            this.authService.loadUserRelatedData();
-          } else {
+          const user = response.data?.user;
+          if (!user) {
             throw new Error('Invalid credentials');
           }
+
+          this.store.setUser(user);
+          localStorage.setItem('authToken', response.data.token);
+          this.authService.loadUserRelatedData();
         }),
-        catchError((error) => {
-          return of({});
-        })
+        catchError(() => of({}))
       )
       .subscribe();
   }

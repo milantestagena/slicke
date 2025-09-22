@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 
 @Component({
   selector: 'app-user-details',
@@ -12,15 +11,28 @@ import { Router } from '@angular/router';
 export class UserDetailsComponent {
   @Output() mailboxClick = new EventEmitter<void>();
   @Output() logoutClick = new EventEmitter<void>();
-  constructor() {}
+
+  readonly menuOpen = signal(false);
 
   openMailbox() {
-    // Navigate to the mailbox route
     this.mailboxClick.emit();
+    this.menuOpen.set(false);
   }
 
   logout() {
-    // Emit an event to notify the parent component to handle logout
     this.logoutClick.emit();
+    this.menuOpen.set(false);
+  }
+
+  toggleMenu() {
+    this.menuOpen.update((value) => !value);
+  }
+
+  showMenu() {
+    this.menuOpen.set(true);
+  }
+
+  hideMenu() {
+    this.menuOpen.set(false);
   }
 }

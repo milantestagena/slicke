@@ -39,9 +39,9 @@ export const ProposalsFeature = signalStoreFeature(
       });
 
       proposalsService.getProposals(collectionId).subscribe({
-        next: (proposals) =>
+        next: (response) =>
           patchState(store, {
-            proposals,
+            proposals: response.data,
             loading: false,
           }),
         error: (err) =>

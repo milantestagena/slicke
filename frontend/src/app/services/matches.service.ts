@@ -8,19 +8,7 @@ import { catchError, map, of, take } from 'rxjs';
 export class MatchesService {
   private httpService = inject(HTTPService);
 
-  getExchangeForCollection(collectionId: number, callback: (data: any) => void) {
-    this.httpService
-      .getRequestWithAuth(`matches/${collectionId}`)
-      .pipe(
-        map((response: any) => response.data?.[0] ?? null),
-        catchError((error) => {
-          console.error('Error loading exchange data:', error);
-          return of(null);
-        }),
-        take(1)
-      )
-      .subscribe((data) => {
-        callback(data);
-      });
+  getExchangeForCollection(collectionId: number) {
+    return this.httpService.getRequestWithAuth(`matches/${collectionId}`);
   }
 }

@@ -1,8 +1,8 @@
 <div class="add-to-collection-form">
   <label for="collection">Choose a collection:</label>
-  <select id="collection" (change)="selectedCollectionId.set($any($event.target).value)">
-    <option [value]="null">-- Select --</option>
-    <option *ngFor="let col of availableCollections" [value]="col.id">
+  <select id="collection" (change)="onCollectionChange($event)">
+    <option value="">-- Select --</option>
+    <option *ngFor="let col of availableCollections()" [value]="col.id">
       {{ col.name }}
     </option>
   </select>

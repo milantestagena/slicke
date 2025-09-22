@@ -1,10 +1,6 @@
-import { Component, inject, Input, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Collection, UserCollection } from '../../models';
 import { AppStore } from '../../store/app.store';
-import { UserCollectionService } from '../../services/user-collection.service';
-import { tap, catchError, of, finalize } from 'rxjs';
-import { StoreService } from '../../services/store.service';
 
 @Component({
   selector: 'app-add-to-collection',
@@ -14,41 +10,25 @@ import { StoreService } from '../../services/store.service';
   styleUrls: ['./add-to-collection.component.scss'],
 })
 export class AddToCollectionComponent {
-  storeService = inject(StoreService);
-  collectionService = inject(UserCollectionService);
-  store = inject(AppStore);
-  userCollections: UserCollection[];
-  availableCollections: Collection[];
-  selectedCollectionId = signal<number | null>(null);
+  private readonly store = inject(AppStore);
 
-  constructor() {
-    this.userCollections = this.store.userCollections();
-    const userCollectionIds = this.userCollections.map((c) => c.collection.id);
-    this.availableCollections = this.store.AvailableCollections().filter(
-      (collection) => {
-        return !userCollectionIds.includes(collection.id as number);
-      }
+  readonly availableCollections = this.store.availableNotOwned;
+  readonly selectedCollectionId = signal<number | null>(null);
+
+  onCollectionChange(event: Event) {
+    const value = (event.target as HTMLSelectElement | null)?.value ?? '';
+    const parsed = value ? Number(value) : null;
+    this.selectedCollectionId.set(
+      parsed !== null && Number.isFinite(parsed) ? parsed : null
     );
   }
 
   submit() {
     const collectionId = this.selectedCollectionId();
-    if (collectionId) {
-      this.collectionService
-        .createUserCollection(collectionId)
-        .pipe(
-          tap((response) => {
-            this.storeService.getUserCollections();
-          }),
-          catchError((error) => {
-            console.error('Greška pri dodavanju kolekcije:', error);
-            return of(null);
-          }),
-          finalize(() => {
-            // Eventualni loading indikator ukloni
-          })
-        )
-        .subscribe();
+    if (!collectionId) {
+      return;
     }
+
+    this.store.addUserCollection(collectionId);
   }
 }

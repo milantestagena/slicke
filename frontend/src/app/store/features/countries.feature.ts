@@ -1,38 +1,55 @@
-import {
-  signalStoreFeature,
-  withState,
-  withMethods,
-  patchState,
-  withHooks,
-} from '@ngrx/signals';
+import { signalStoreFeature, withState, withMethods, withHooks, patchState } from '@ngrx/signals';
+import { inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Country } from '../../models';
-import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { HTTPService } from '../../services/http.service';
-import { GetUrls } from '../../enums';
-import { map, take } from 'rxjs';
+import { CountryService } from '../../services/country.service';
+import { catchError, finalize, of, take } from 'rxjs';
+
+interface CountryState {
+  Countries: Country[];
+  loading: boolean;
+  error: string | null;
+}
+
+let countryService: CountryService;
+let destroyRef: DestroyRef;
 
 export const CountryFeature = signalStoreFeature(
-  withState<{ Countries: Country[]  }>({ Countries: [] }),
-  withMethods((store) => ({
-    setCountries: (countries: Country[]) =>
-      patchState(store, { Countries: countries }),
-    getCountries: () => (store.Countries())
-  })),
-  withHooks((store) => ({
+  withState<CountryState>({ Countries: [], loading: false, error: null }),
+
+  withHooks(() => ({
     onInit() {
-      const injector = inject(Injector);
-      runInInjectionContext(injector, () => {
-        const apiService: HTTPService = inject(HTTPService);
-        apiService
-          .getRequest(GetUrls.GET_ALL_COUNTRIES)
-          .pipe(
-            map((response) => {
-              store.setCountries(response.data);
-            }),
-            take(1)
-          )
-          .subscribe();
-      });
+      countryService = inject(CountryService);
+      destroyRef = inject(DestroyRef);
+      // opcionalno auto-load:
+      // methods.loadCountries();
     },
   })),
+
+  withMethods((store) => {
+    const load = () => {
+      patchState(store, { loading: true, error: null });
+      countryService
+        .getCountries()
+        .pipe(
+          take(1),
+          catchError(() => of<Country[]>([])),
+          finalize(() => patchState(store, { loading: false })),
+          takeUntilDestroyed(destroyRef)
+        )
+        .subscribe(list => patchState(store, { Countries: list }));
+    };
+
+    const methods = {
+      setCountries(countries: Country[]) {
+        patchState(store, { Countries: countries });
+      },
+      getCountries() {
+        return store.Countries();
+      },
+      loadCountries: load,
+    };
+
+    return methods;
+  })
 );

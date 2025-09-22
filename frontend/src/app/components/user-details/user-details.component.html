@@ -1,9 +1,16 @@
 <div class="user-details">
-  <img src="path/to/avatar.png" alt="User Avatar" class="avatar" />
-  <div class="dropdown">
-    <button class="dropdown-toggle">⋮</button>
-    <div class="dropdown-menu">
-      <a href="#" (click)="openMailbox()">Mailbox</a>
-      <a href="#" (click)="logout()">Logout</a>
+  <div
+    class="dropdown"
+    [class.open]="menuOpen()"
+    (mouseenter)="showMenu()"
+    (mouseleave)="hideMenu()"
+  >
+    <button class="dropdown-toggle" type="button" (click)="toggleMenu()">
+      Menu &#9662;
+    </button>
+    <div class="dropdown-menu" *ngIf="menuOpen()" (mouseenter)="showMenu()" (mouseleave)="hideMenu()">
+      <button type="button" (click)="openMailbox()">Mailbox</button>
+      <button type="button" (click)="logout()">Logout</button>
+    </div>
   </div>
 </div>

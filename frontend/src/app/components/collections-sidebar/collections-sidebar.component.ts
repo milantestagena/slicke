@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserCollectionService } from '../../services/user-collection.service';
 import { UserCollection } from '../../models';
@@ -11,9 +11,9 @@ import { AppStore } from '../../store/app.store';
   templateUrl: './collections-sidebar.component.html',
   styleUrls: ['./collections-sidebar.component.scss'],
 })
-export class CollectionsSidebarComponent {
+export class CollectionsSidebarComponent implements OnInit {
   store = inject(AppStore);
-  collections = this.store.userCollections;
+
   openedExchange: any = null;
 
   @Output() collectionSelected = new EventEmitter<UserCollection>();
@@ -21,7 +21,15 @@ export class CollectionsSidebarComponent {
   @Output() exchangeSelected = new EventEmitter<UserCollection>();
   @Output() proposalsSelected = new EventEmitter<UserCollection>();
 
+  public collections!: Signal<UserCollection[]>;
+
+  ngOnInit(): void {
+    this.store.loadUserCollections();
+    this.collections = this.store.userCollections;
+  }
+
   select(collection: UserCollection) {
+    this.store.loadUserCollections();
     this.collectionSelected.emit(collection);
   }
 

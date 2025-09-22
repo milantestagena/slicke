@@ -3,10 +3,12 @@ import { HTTPService } from './http.service';
 import { Proposal } from '../models/proposal.model';
 import { Observable } from 'rxjs';
 import { ValidResponse } from '../models/valid-response.model';
+import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProposalService {
   private http = inject(HTTPService);
+  private notificationService = inject(NotificationService);
 
   createProposal(data: {
     collection_id: number;
@@ -14,7 +16,7 @@ export class ProposalService {
     offer: number[];
     need: number[];
   }): void {
-    this.http.requestWithNotification<any>(
+    this.notificationService.requestWithNotification<any>(
       'post',
       `create_proposal`,
       true,
@@ -25,7 +27,7 @@ export class ProposalService {
   }
 
   acceptProposal(id: number): Observable<any> {
-    return this.http.requestWithNotification<any>(
+    return this.notificationService.requestWithNotification<any>(
       'put',
       `accept_proposal/${id}`,
       true,
@@ -36,7 +38,7 @@ export class ProposalService {
   }
 
   refuseProposal(id: number): Observable<any> {
-    return this.http.requestWithNotification<any>(
+    return this.notificationService.requestWithNotification<any>(
       'put',
       `refuse_proposal/${id}`,
       true,
@@ -47,7 +49,7 @@ export class ProposalService {
   }
 
   getProposals(collectionId: number): Observable<ValidResponse<Proposal[]>> {
-    return this.http.requestWithNotification<ValidResponse<Proposal[]>>(
+    return this.notificationService.requestWithNotification<ValidResponse<Proposal[]>>(
       'get',
       `get_proposals/${collectionId}`,
       true,
@@ -58,7 +60,7 @@ export class ProposalService {
   }
 
   getProposal(id: number): Observable<Proposal> {
-    return this.http.requestWithNotification<Proposal>(
+    return this.notificationService.requestWithNotification<Proposal>(
       'get',
       `get_proposal/${id}`,
       true,

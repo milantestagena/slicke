@@ -1,23 +1,14 @@
-import {
-  Component,
-  effect,
-  inject,
-  Injector,
-  OnInit,
-  runInInjectionContext,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoginFormComponent } from '../login-form/login-form.component';
-import { UserDetailsComponent } from '../user-details/user-details.component';
-import { DynamicHostComponent } from '../dinamic-host/dinamic-host.component';
-import { NotificationComponent } from '../notification/notification.component';
-
-import { AppStore } from '../../store/app.store';
-import { AuthService } from '../../services/auth.service';
-import { User } from '../../models';
-import { ViewChild } from '@angular/core';
-import { CollectionsSidebarComponent } from '../collections-sidebar/collections-sidebar.component';
+import { Component, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { UserCollection } from '../../models';
+import { AuthService } from '../../services/auth.service';
+import { AppStore } from '../../store/app.store';
+import { CollectionsSidebarComponent } from '../collections-sidebar/collections-sidebar.component';
+import { DynamicHostComponent } from '../dinamic-host/dinamic-host.component';
+import { LoginFormComponent } from '../login-form/login-form.component';
+import { NotificationComponent } from '../notification/notification.component';
+import { UserDetailsComponent } from '../user-details/user-details.component';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -31,42 +22,27 @@ import { UserCollection } from '../../models';
     NotificationComponent,
     CollectionsSidebarComponent,
   ],
-  providers: [],
 })
 export class HomeComponent implements OnInit {
-  store: any;
-  data: any = {};
-  user!: User;
-  selectedCollection: UserCollection | null = null;
-  private authService: AuthService = inject(AuthService);
-  constructor() {
-    this.store = inject(AppStore);
-    const injector = inject(Injector);
-    runInInjectionContext(injector, () => {
-      effect(() => {
-        this.user = this.store.getUser();
-      });
-    });
-  }
+  private readonly appStore = inject(AppStore);
+  private readonly authService = inject(AuthService);
+
+  readonly user = this.appStore.user;
+  readonly isLoggedIn = this.appStore.isAuthenticated;
 
   @ViewChild(DynamicHostComponent)
   dynamicHost!: DynamicHostComponent;
 
-  onCollectionSelected(collection: UserCollection) {
-    this.selectedCollection = collection;
-    this.dynamicHost.loadUserCollection(collection);
-  }
-
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
       this.authService.loadUserRelatedData();
     }
   }
 
-  logout() {
-    this.authService.logout();
-    window.location.reload();
+  onCollectionSelected(collection: UserCollection) {
+    this.dynamicHost.loadUserCollection(collection);
   }
+
   onAddCollectionRequested() {
     this.dynamicHost.loadAddToCollectionComponent();
   }
@@ -81,5 +57,10 @@ export class HomeComponent implements OnInit {
 
   onLoadProposals(collection: UserCollection) {
     this.dynamicHost.loadProposals(collection);
+  }
+
+  logout() {
+    this.authService.logout();
+    window.location.reload();
   }
 }

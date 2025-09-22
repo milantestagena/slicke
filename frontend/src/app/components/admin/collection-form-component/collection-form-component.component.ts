@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -12,9 +7,7 @@ import {
   FormArray,
 } from '@angular/forms';
 import { AppStore } from '../../../store/app.store';
-import { Collection, CollectionItem, Country } from '../../../models';
-import { CollectionService } from '../../../services/collection.service';
-import { StoreService } from '../../../services/store.service';
+import { Collection, CollectionItem, Country, CollectionPayload } from '../../../models';
 
 type Mode = 'create' | 'edit';
 
@@ -26,21 +19,15 @@ type Mode = 'create' | 'edit';
   styleUrls: ['./collection-form-component.component.scss'],
 })
 export class CollectionFormComponentComponent implements OnInit {
-  store: any;
-  countries!: Country[];
-  collectionService: CollectionService;
-  storeService: StoreService;
-  constructor() {
-    this.store = inject(AppStore);
-    this.storeService = inject(StoreService);
-    this.collectionService = inject(CollectionService);
-  }
+  private readonly store = inject(AppStore);
+  private readonly fb = inject(FormBuilder);
+
   @Input() mode: Mode = 'edit';
   @Input() collection?: Collection;
 
-  private fb = inject(FormBuilder);
+  countries: Country[] = [];
 
-  form = this.fb.group({
+  readonly form = this.fb.group({
     name: [''],
     type: [''],
     year: [new Date().getFullYear()],
@@ -68,8 +55,8 @@ export class CollectionFormComponentComponent implements OnInit {
   }
 
   private initCountriesCheck() {
+    this.store.loadCountries();
     this.countries = this.store.getCountries();
-    console.log('Available countries:', this.countries);
     const group: { [key: string]: any } = {};
     this.countries.forEach((country) => {
       group[country.id] = [false];
@@ -78,7 +65,7 @@ export class CollectionFormComponentComponent implements OnInit {
   }
 
   private adjustItems(count: number) {
-    const items = this.form.get('items') as FormArray;
+    const items = this.items;
     while (items.length < count) {
       items.push(
         this.fb.group({
@@ -96,26 +83,27 @@ export class CollectionFormComponentComponent implements OnInit {
 
   save() {
     const raw = this.form.getRawValue();
-    console.log('Form raw value:', raw);
-    const selectedCountries = Object.entries(raw.countries)
-      .filter(([_, checked]) => checked)
-      .map(([id]) => parseInt(id, 10)) as unknown as Country[];
-
-    const result: Collection = {
+    const selectedIdSet = new Set(
+      Object.entries(raw.countries)
+        .filter(([, checked]) => checked)
+        .map(([id]) => Number(id))
+        .filter((id) => Number.isFinite(id)),
+    );
+    const result: CollectionPayload = {
       name: raw.name as string,
       type: raw.type as string,
       year: raw.year as number,
       description: raw.description as string,
       link: raw.link as string,
-      countries: selectedCountries as Country[],
+      countries: Array.from(selectedIdSet),
       items: raw.items as CollectionItem[],
     };
-    if(this.mode === 'edit') {
+
+    if (this.mode === 'edit') {
       result.id = this.collection?.id;
     }
 
-
-    this.storeService.saveCollection(result);
+    this.store.saveCollection(result);
   }
 
   patchFormFromCollection(collection: Collection) {
@@ -130,7 +118,7 @@ export class CollectionFormComponentComponent implements OnInit {
 
     this.adjustItems(collection.items.length);
 
-    const itemsArray = this.form.get('items') as FormArray;
+    const itemsArray = this.items;
     collection.items.forEach((item, index) => {
       itemsArray.at(index).patchValue({
         title: item.title,

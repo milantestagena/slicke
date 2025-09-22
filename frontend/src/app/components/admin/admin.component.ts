@@ -1,14 +1,15 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
 
-import { StoreService } from '../../services/store.service';
-import { AppStore } from '../../store/app.store';
 import { AdminCollectionsSidebarComponent } from './admin-collections-sidebar/admin-collections-sidebar.component';
-import { CollectionFormComponentComponent } from './collection-form-component/collection-form-component.component';
 import { DynamicHostComponent } from '../dinamic-host/dinamic-host.component';
 import { Collection } from '../../models';
 import { CountryService } from '../../services/country.service';
+import { NotificationComponent } from '../notification/notification.component';
+import { AppStore } from '../../store/app.store';
+
+const ADMIN_TOKEN_KEY = 'admin_token';
 
 @Component({
   selector: 'app-admin',
@@ -18,6 +19,7 @@ import { CountryService } from '../../services/country.service';
     AdminLoginComponent,
     AdminCollectionsSidebarComponent,
     DynamicHostComponent,
+    NotificationComponent,
   ],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss'],
@@ -27,30 +29,29 @@ export class AdminComponent implements OnInit {
   @ViewChild(DynamicHostComponent)
   dynamicHost!: DynamicHostComponent;
 
-  store: any;
-  isLoggedIn: boolean = false;
 
-  constructor(private storeService: StoreService, private countryService: CountryService) {
-    this.store = inject(AppStore);
+  private readonly store = inject(AppStore);
+  private readonly countryService = inject(CountryService);
+
+  readonly isLoggedIn = signal(this.hasValidToken());
+
+  ngOnInit(): void {
+    if (!this.isLoggedIn()) {
+      return;
+    }
+
+    this.store.getCollections();
+    this.store.loadCountries();
   }
 
-  ngOnInit() {
-    this.isLoggedIn = this.checkLogin();
-    this.storeService.getAllCollections();
-    this.countryService.getCountries();
+  private hasValidToken(): boolean {
+    const expiry = Number(localStorage.getItem(ADMIN_TOKEN_KEY));
+    return Number.isFinite(expiry) && Date.now() < expiry;
   }
 
-  checkLogin(): boolean {
-    const token = localStorage.getItem('admin_token');
-    if (!token) return false;
-
-    const now = new Date().getTime();
-    const expiry = parseInt(token, 10);
-    return now < expiry;
-  }
-
-  logout() {
-    localStorage.removeItem('admin-token');
+  logout(): void {
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    this.isLoggedIn.set(false);
     location.reload();
   }
 

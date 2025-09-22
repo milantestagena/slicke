@@ -1,12 +1,12 @@
 <div class="sticker-wrapper">
-  <div class="sticker" [ngClass]="colorClass" [title]="item.item.description">
-    <div class="identifier">{{ item.item.identifier }}</div>
-    <img [src]="item.item.link" alt="Sticker" (error)="onImgError($event)"/>
+  <div class="sticker" [ngClass]="colorClass()" [title]="item().item.description">
+    <div class="identifier">{{ item().item.identifier }}</div>
+    <img [src]="item().item.link" alt="Sticker" (error)="onImgError($event)" />
     <div class="counter-row">
-      <button class="counter-btn" (click)="decrement()">−</button>
-      <div class="counter-badge" [ngClass]="colorClass">{{ item.counter }}</div>
+      <button class="counter-btn" (click)="decrement()">-</button>
+      <div class="counter-badge" [ngClass]="colorClass()">{{ counterValue }}</div>
       <button class="counter-btn" (click)="increment()">+</button>
     </div>
   </div>
-  <div class="title">{{ item.item.title }}</div>
+  <div class="title">{{ item().item.title }}</div>
 </div>

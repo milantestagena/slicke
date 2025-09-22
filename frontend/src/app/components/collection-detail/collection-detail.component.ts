@@ -1,17 +1,18 @@
 import {
   Component,
   Input,
-  signal,
-  computed,
-  effect,
   WritableSignal,
+  computed,
   inject,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserCollection } from '../../models';
 import { UserCollectionItemComponent } from '../user-collection-item/user-collection-item.component';
 import { UserCollectionService } from '../../services/user-collection.service';
 import { NotificationService } from '../../services/notification.service';
+import { AppStore } from '../../store/app.store';
+
 @Component({
   selector: 'app-collection-detail',
   standalone: true,
@@ -20,67 +21,80 @@ import { NotificationService } from '../../services/notification.service';
   styleUrls: ['./collection-detail.component.scss'],
 })
 export class CollectionDetailComponent {
-  @Input() collection!: UserCollection;
+  private _collection: UserCollection | null = null;
+  store = inject(AppStore);
 
-  collectionService = inject(UserCollectionService);
-  notificationService = inject(NotificationService);
+  @Input() set collection(value: UserCollection | null) {
+    this._collection = value;
+    this.resetCounters();
+  }
 
-  currentCounters: WritableSignal<Record<number, number>> = signal({});
-  originalCounters: Record<number, number> = {};
+  get collection(): UserCollection | null {
+    return this._collection;
+  }
 
-  ngOnInit() {
-    // zabeleži originalne vrednosti
+  private readonly collectionService = inject(UserCollectionService);
+  private readonly notificationService = inject(NotificationService);
+
+  readonly currentCounters: WritableSignal<Record<number, number>> = signal({});
+  readonly originalCounters = signal<Record<number, number>>({});
+
+  private resetCounters(): void {
+    const collection = this.collection;
+    if (!collection?.items?.length) {
+      this.originalCounters.set({});
+      this.currentCounters.set({});
+      return;
+    }
+
     const snapshot: Record<number, number> = {};
-    this.collection.items.forEach((item) => {
-      snapshot[item.item.id] = item.counter;
+    collection.items.forEach((item) => {
+      snapshot[item.id] = item.counter;
     });
 
-    this.originalCounters = snapshot;
+    this.originalCounters.set(snapshot);
     this.currentCounters.set({ ...snapshot });
   }
 
   onCounterChanged(change: { id: number; counter: number }) {
-    const updated = { ...this.currentCounters() };
-    updated[change.id] = change.counter;
-    this.currentCounters.set(updated);
+    this.currentCounters.update((current) => ({
+      ...current,
+      [change.id]: change.counter,
+    }));
   }
 
-  hasChanges = computed(() => {
+  readonly hasChanges = computed(() => {
     const current = this.currentCounters();
-    for (const id in current) {
-      if (current[id] !== this.originalCounters[+id]) {
-        return true;
-      }
-    }
-    return false;
+    const original = this.originalCounters();
+
+    return Object.entries(current).some(([id, counter]) => {
+      const numericId = Number(id);
+      return counter !== original[numericId];
+    });
   });
 
-  getChangedItems(): Record<number, number> {
+  private getChangedItems(): Record<number, number> {
     const current = this.currentCounters();
-    const result: Record<number, number> = {};
-    for (const id in current) {
-      const original = this.originalCounters[+id];
-      if (current[id] !== original) {
-        result[+id] = current[id];
+    const original = this.originalCounters();
+    const changes: Record<number, number> = {};
+
+    for (const [id, counter] of Object.entries(current)) {
+      const numericId = Number(id);
+      if (counter !== original[numericId]) {
+        changes[numericId] = counter;
       }
     }
-    return result;
+
+    return changes;
   }
 
   submitUpdate() {
     const payload = this.getChangedItems();
-    this.collectionService
-      .updateUserCollection(this.collection.id, { items: payload })
-      .subscribe({
-        next: () => {
-          this.notificationService.show(
-            'success',
-            'Collection updated successfully'
-          );
-        },
-        error: (err) => {
-          this.notificationService.show('error', 'Collection update failed');
-        },
-      });
+    if (!Object.keys(payload).length || !this.collection) {
+      return;
+    }
+
+    this.store.updateUserCollection(this.collection.id, { items: payload });
+    this.originalCounters.set({ ...this.currentCounters() });
   }
 }

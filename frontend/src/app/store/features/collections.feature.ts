@@ -1,33 +1,106 @@
-// src/app/store/features/collections.feature.ts
-
 import {
   signalStoreFeature,
   withState,
   withMethods,
   withHooks,
-  patchState,
   withComputed,
+  patchState,
 } from '@ngrx/signals';
-import {
-  computed,
-  inject,
-  Injector,
-  runInInjectionContext,
-} from '@angular/core';
-import { Collection } from '../../models';
-import { HTTPService } from '../../services/http.service';
-import { GetUrls } from '../../enums';
-import { map, take } from 'rxjs';
+import { inject, DestroyRef, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Collection, CollectionPayload } from '../../models';
+import { CollectionService } from '../../services/collection.service';
+import { NotificationService } from '../../services/notification.service';
+import { catchError, finalize, map, of, take, tap } from 'rxjs';
+
+interface CollectionsState {
+  collections: Collection[];
+  loading: boolean;
+  error: string | null;
+}
+
+let collectionService: CollectionService;
+let notificationService: NotificationService;
+let destroyRef: DestroyRef;
 
 export const CollectionsFeature = signalStoreFeature(
-  withState<{ collections: Collection[] }>({ collections: [] }),
-  withComputed((state) => ({
-    collections$: computed(() => state.collections),
-  })),
-  withMethods((store) => ({
-    setCollections: (collections: Collection[]) =>
-      patchState(store, { collections }),
+  withState<CollectionsState>({
+    collections: [],
+    loading: false,
+    error: null,
+  }),
 
-    getCollections: () => [...store.collections()],
-  }))
+  withHooks(() => ({
+    onInit() {
+      collectionService = inject(CollectionService);
+      notificationService = inject(NotificationService);
+      destroyRef = inject(DestroyRef);
+    },
+  })),
+
+  withComputed((store) => ({
+    hasCollections: computed(() => store.collections().length > 0),
+  })),
+
+  withMethods((store) => {
+    const reloadAll = () => {
+      patchState(store, { loading: true, error: null });
+      collectionService
+        .getAllCollections()
+        .pipe(
+          take(1),
+          map((r: { data: Collection[] }) => r?.data ?? []),
+          catchError(() => {
+            patchState(store, { error: 'loadAll failed' });
+            return of<Collection[]>([]);
+          }),
+          finalize(() => patchState(store, { loading: false })),
+          takeUntilDestroyed(destroyRef)
+        )
+        .subscribe((list) => {
+          patchState(store, { collections: list });
+        });
+    };
+
+    return {
+      setCollections(collections: Collection[]) {
+        patchState(store, { collections });
+      },
+
+      getCollections() {
+        return [...store.collections()];
+      },
+
+
+      loadAllCollections: reloadAll,
+
+      saveCollection(collection: Collection | CollectionPayload) {
+        collectionService
+          .saveCollection(collection)
+          .pipe(
+            tap(() => {
+              reloadAll();
+              notificationService.show('success', 'Collection saved.');
+            }),
+            catchError(() => {
+              notificationService.show('error', 'Could not save collection.');
+              return of(null);
+            }),
+            takeUntilDestroyed(destroyRef)
+          )
+          .subscribe();
+      },
+
+      deleteCollection(id: number) {
+        collectionService
+          .deleteCollection(id)
+          .pipe(
+            tap(() => reloadAll()),
+            catchError(() => of(null)),
+            takeUntilDestroyed(destroyRef)
+          )
+          .subscribe();
+      },
+    };
+  })
 );

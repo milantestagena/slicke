@@ -1,4 +1,4 @@
-<div class="collection-detail" *ngIf="collection">
+<div class="collection-detail" *ngIf="collection as collection">
   <h2>{{ collection.collection.name }}</h2>
   <p class="description">{{ collection.collection.description }}</p>
   <p><strong>Year:</strong> {{ collection.collection.year }}</p>

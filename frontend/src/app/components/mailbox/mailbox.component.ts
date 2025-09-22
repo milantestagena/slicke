@@ -1,19 +1,17 @@
 import {
   Component,
   ComponentRef,
+  OnInit,
   computed,
-  effect,
   inject,
-  Injector,
-  runInInjectionContext,
   signal,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { take } from 'rxjs/operators';
 import { Conversation, ConversationWithUser, User } from '../../models';
 import { AppStore } from '../../store/app.store';
-import { StoreService } from '../../services/store.service';
-import { CommonModule } from '@angular/common';
 import { CreateMessageFormComponent } from './create-message-form/create-message-form.component';
 import { MessageService } from '../../services/message.service';
 
@@ -21,70 +19,67 @@ import { MessageService } from '../../services/message.service';
   selector: 'app-mailbox',
   templateUrl: './mailbox.component.html',
   styleUrls: ['./mailbox.component.scss'],
-  standalone: true, // Ensure this is a standalone component
-  imports: [CommonModule], // Add CommonModule here
+  standalone: true,
+  imports: [CommonModule],
 })
-export class MailboxComponent {
+export class MailboxComponent implements OnInit {
   @ViewChild('formContainer', { read: ViewContainerRef })
   formContainer!: ViewContainerRef;
 
-  createMessageFormRef: ComponentRef<CreateMessageFormComponent> | null = null;
-  private messageService = inject(MessageService);
-  private storeService = inject(StoreService);
+  private readonly store = inject(AppStore);
+  private readonly messageService = inject(MessageService);
 
-  store: any;
-  user: User | null = null;
-  activeConversation;
-  correspondentId = signal<number>(0);
-  correspondentName!: string;
+  private createMessageFormRef: ComponentRef<CreateMessageFormComponent> | null =
+    null;
 
-  conversations = this.storeService.store.Conversations;
-  conversationsWithUsers = this.storeService.store.ConversationWithUser;
+  readonly conversations = this.store.Conversations;
+  private readonly conversationsWithUsers = this.store.ConversationWithUser;
 
-  isFormVisible = signal(false);
+  private readonly userSignal = this.store.user;
+  get user(): User | null {
+    return this.userSignal();
+  }
 
-  constructor() {
-    this.store = inject(AppStore);
-    const injector = inject(Injector);
-    this.storeService.getConversations();
-    this.activeConversation = computed(() => {
-      const id = this.correspondentId();
-      return id ? this.conversationsWithUsers()[id] : null;
-    });
-    runInInjectionContext(injector, () => {
-      effect(() => {
-        this.user = this.store.getUser();
-      });
-    });
+  readonly correspondentId = signal<number>(0);
+  readonly isFormVisible = signal(false);
+  private readonly correspondentNameSignal = signal('');
+  get correspondentName(): string {
+    return this.correspondentNameSignal();
+  }
+
+  readonly activeConversation = computed<ConversationWithUser | null>(() => {
+    const id = this.correspondentId();
+    if (!id) {
+      return null;
+    }
+
+    return this.conversationsWithUsers()[id] ?? null;
+  });
+
+  ngOnInit(): void {
+    this.store.loadConversations();
   }
 
   selectUser(conversation: Conversation) {
     this.isFormVisible.set(false);
+    const currentUserId = this.userSignal()?.id;
+    if (!currentUserId) {
+      return;
+    }
+
     const correspondentId =
-      conversation.sender_id === this.user?.id
+      conversation.sender_id === currentUserId
         ? conversation.receiver_id
         : conversation.sender_id;
 
-    this.correspondentId.set(correspondentId);
-    this.correspondentName =
-      conversation.sender_id === this.user?.id
+    const correspondentName =
+      conversation.sender_id === currentUserId
         ? conversation.receiver_name
         : conversation.sender_name;
 
-    this.storeService.getConversationWithUser(correspondentId);
-  }
-
-  getCorrespondentName(): string {
-    const activeConv = this.activeConversation();
-    return activeConv?.sender_id === this.user?.id
-      ? activeConv?.receiver_name
-      : activeConv?.sender_name;
-  }
-  getCorrespondentId(): number {
-    const activeConv = this.activeConversation();
-    return activeConv?.sender_id === this.user?.id
-      ? activeConv?.receiver_id
-      : activeConv?.sender_id;
+    this.correspondentId.set(correspondentId);
+    this.correspondentNameSignal.set(correspondentName);
+    this.store.loadConversationWithUser(correspondentId);
   }
 
   showCreateMailForm(event: MouseEvent) {
@@ -95,11 +90,13 @@ export class MailboxComponent {
       CreateMessageFormComponent
     );
 
-    this.createMessageFormRef.instance.formSubmit.subscribe((data) => {
-      this.messageService.sendMessage(data.message, data.recipient);
-      this.formContainer.clear();
-      this.isFormVisible.set(false);
-      this.correspondentId.set(0)
-    });
+    this.createMessageFormRef.instance.formSubmit
+      .pipe(take(1))
+      .subscribe((data) => {
+        this.messageService.sendMessage(data.message, data.recipient);
+        this.formContainer.clear();
+        this.isFormVisible.set(false);
+        this.correspondentId.set(0);
+      });
   }
 }

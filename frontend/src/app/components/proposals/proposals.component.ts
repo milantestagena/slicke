@@ -1,9 +1,17 @@
-import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  inject,
+  signal,
+} from '@angular/core';
+import { take, finalize } from 'rxjs/operators';
 import { ProposalService } from '../../services/proposal.service';
 import { Proposal } from '../../models/proposal.model';
 import { AppStore } from '../../store/app.store';
-import { User, UserCollection } from '../../models';
+import { UserCollection } from '../../models';
 import { ProposalItemComponent } from '../proposal-item/proposal-item.component';
 
 @Component({
@@ -14,63 +22,101 @@ import { ProposalItemComponent } from '../proposal-item/proposal-item.component'
   styleUrls: ['./proposals.component.scss'],
 })
 export class ProposalsComponent {
-  private proposalService = inject(ProposalService);
-  private store = inject(AppStore);
+  readonly userCollection = input<UserCollection | null>(null);
 
-  user: User | null = null;
-  proposals: Proposal[] = [];
-  formattedProposals: { sent: Proposal[]; received: Proposal[] } = {
-    sent: [],
-    received: [],
-  };
-  loading = false;
+  private readonly proposalService = inject(ProposalService);
+  private readonly store = inject(AppStore);
 
-  activeTab: 'sent' | 'received' = 'sent';
+  private readonly userSignal = this.store.user;
+  private readonly proposalsSignal = signal<Proposal[]>([]);
+  private readonly formattedProposalsSignal = computed(() => {
+    const user = this.userSignal();
+    const proposals = this.proposalsSignal();
 
-  private _userCollection!: UserCollection;
+    if (!user?.id) {
+      return { sent: [], received: [] };
+    }
 
-  @Input()
-  set userCollection(value: UserCollection) {
-    if (!value) return;
-    this._userCollection = value;
-    this.loadProposals();
+    return {
+      sent: proposals.filter((p) => p.sender.id === user.id),
+      received: proposals.filter((p) => p.receiver.id === user.id),
+    };
+  });
+
+  private readonly loadingSignal = signal(false);
+  private readonly activeTabSignal = signal<'sent' | 'received'>('sent');
+
+  get loading(): boolean {
+    return this.loadingSignal();
   }
 
-  private loadProposals() {
-    this.user = this.store.getUser() as User;
-    if (!this.user || !this._userCollection?.collection?.id) return;
+  get activeTab(): 'sent' | 'received' {
+    return this.activeTabSignal();
+  }
 
-    this.loading = true;
+  set activeTab(tab: 'sent' | 'received') {
+    this.activeTabSignal.set(tab);
+  }
+
+  get formattedProposals() {
+    return this.formattedProposalsSignal();
+  }
+
+  constructor() {
+    effect(() => {
+      const user = this.userSignal();
+      const collection = this.userCollection();
+
+      if (!user?.id || !collection?.collection?.id) {
+        this.proposalsSignal.set([]);
+        return;
+      }
+
+      this.fetchProposals(collection.collection.id);
+    });
+  }
+
+  private fetchProposals(collectionId: number) {
+    this.loadingSignal.set(true);
 
     this.proposalService
-      .getProposals(this._userCollection.collection.id)
+      .getProposals(collectionId)
+      .pipe(
+        take(1),
+        finalize(() => this.loadingSignal.set(false)),
+      )
       .subscribe({
         next: (response) => {
-          this.proposals = response.data;
-          this.formattedProposals = {
-            sent: this.proposals.filter((p) => p.sender.id === this.user?.id),
-            received: this.proposals.filter(
-              (p) => p.receiver.id === this.user?.id
-            ),
-          };
-          this.loading = false;
+          this.proposalsSignal.set(response.data ?? []);
         },
         error: () => {
-          this.loading = false;
+          this.proposalsSignal.set([]);
         },
       });
   }
 
   acceptProposal(proposal: Proposal) {
-    this.proposalService.acceptProposal(proposal.id).subscribe(() => {
-      // osveži listu ili ažuriraj status
-    });
+    this.proposalService
+      .acceptProposal(proposal.id)
+      .pipe(take(1))
+      .subscribe(() => {
+        const collection = this.userCollection();
+        if (collection?.collection?.id) {
+          this.fetchProposals(collection.collection.id);
+        }
+      });
   }
 
   refuseProposal(proposal: Proposal) {
-    this.proposalService.refuseProposal(proposal.id).subscribe(() => {
-      // osveži listu ili ukloni iz prikaza
-    });
+    this.proposalService
+      .refuseProposal(proposal.id)
+      .pipe(take(1))
+      .subscribe(() => {
+        const collection = this.userCollection();
+        if (collection?.collection?.id) {
+          this.fetchProposals(collection.collection.id);
+        }
+      });
   }
 
   getOfferedItems(proposal: Proposal) {
@@ -80,6 +126,4 @@ export class ProposalsComponent {
   getRequestedItems(proposal: Proposal) {
     return proposal.items.filter((item) => item.user_id !== proposal.sender.id);
   }
-
-
 }

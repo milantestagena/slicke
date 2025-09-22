@@ -1,4 +1,11 @@
-import { Component, Input, inject, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppStore } from '../../store/app.store';
 import {
@@ -16,69 +23,85 @@ import { ProposalService } from '../../services/proposal.service';
   templateUrl: './collection-exchange.component.html',
   styleUrl: './collection-exchange.component.scss',
 })
-export class CollectionExchangeComponent {
-  @Input() collection!: UserCollection;
+export class CollectionExchangeComponent implements OnChanges {
+  @Input({ required: true }) collection!: UserCollection;
 
-  private store = inject(AppStore);
-  private proposalService = inject(ProposalService);
-  exchangeData = this.store.exchangeData;
+  private readonly store = inject(AppStore);
+  private readonly proposalService = inject(ProposalService);
+  readonly exchangeData = this.store.exchangeData;
 
-  selectedToGiveIds = new Set<number>();
-  selectedToTakeIds = new Set<number>();
-  itemMap = new Map<string, UserCollectionItem>();
+  readonly selectedToGiveIds = signal(new Set<number>());
+  readonly selectedToTakeIds = signal(new Set<number>());
+  private itemMap = new Map<string, UserCollectionItem>();
 
-  ngOnInit() {
-    this.store.loadExchangeForCollection(this.collection.id);
-    this.itemMap = new Map(
-      this.collection.items.map((i) => [i.item.id.toString(), i])
-    );
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('collection' in changes && this.collection) {
+      this.store.loadExchangeForCollection(this.collection.id);
+      this.itemMap = new Map(
+        this.collection.items.map((i) => [i.item.id.toString(), i]),
+      );
+      this.selectedToGiveIds.set(new Set());
+      this.selectedToTakeIds.set(new Set());
+    }
   }
 
   getToGiveItems(): UserCollectionItem[] {
-    if (!this.exchangeData()) return [];
-    const mapped = this.exchangeData()?.toGiveIds.map((id: number) => {
-      const item = this.itemMap.get(id.toString());
-      return item;
-    });
-    return mapped as UserCollectionItem[];
+    const data = this.exchangeData();
+    if (!data) {
+      return [];
+    }
+
+    return data.toGiveIds
+      .map((id: number) => this.itemMap.get(id.toString()) ?? null)
+      .filter((item): item is UserCollectionItem => item !== null);
   }
 
   getToTakeItems(): UserCollectionItem[] {
-    if (!this.exchangeData()) return [];
-    return this.exchangeData()
-      ?.toTakeIds.map((id: number) => this.itemMap.get(id.toString()))
-      .filter((i): i is UserCollectionItem => !!i) as UserCollectionItem[];
+    const data = this.exchangeData();
+    if (!data) {
+      return [];
+    }
+
+    return data.toTakeIds
+      .map((id: number) => this.itemMap.get(id.toString()) ?? null)
+      .filter((item): item is UserCollectionItem => item !== null);
   }
 
   isSelectedToGive(item: CollectionItem): boolean {
-    return this.selectedToGiveIds.has(item.id);
+    return this.selectedToGiveIds().has(item.id);
   }
 
   isSelectedToTake(item: CollectionItem): boolean {
-    return this.selectedToTakeIds.has(item.id);
+    return this.selectedToTakeIds().has(item.id);
   }
 
   onToggleToGive(event: { item: CollectionItem; selected: boolean }) {
-    event.selected
-      ? this.selectedToGiveIds.add(event.item.id)
-      : this.selectedToGiveIds.delete(event.item.id);
+    const nextSet = new Set(this.selectedToGiveIds());
+    event.selected ? nextSet.add(event.item.id) : nextSet.delete(event.item.id);
+    this.selectedToGiveIds.set(nextSet);
   }
 
   onToggleToTake(event: { item: CollectionItem; selected: boolean }) {
-    event.selected
-      ? this.selectedToTakeIds.add(event.item.id)
-      : this.selectedToTakeIds.delete(event.item.id);
+    const nextSet = new Set(this.selectedToTakeIds());
+    event.selected ? nextSet.add(event.item.id) : nextSet.delete(event.item.id);
+    this.selectedToTakeIds.set(nextSet);
   }
 
   submitExchange() {
+    const data = this.exchangeData();
+    if (!data) {
+      return;
+    }
+
     const payload = {
-      receiver_id: Number(this.exchangeData()?.otherUserId),
-      collection_id: Number(this.exchangeData()?.collectionId),
-      offer: Array.from(this.selectedToGiveIds),
-      need: Array.from(this.selectedToTakeIds),
+      receiver_id: Number(data.otherUserId),
+      collection_id: Number(data.collectionId),
+      offer: Array.from(this.selectedToGiveIds()),
+      need: Array.from(this.selectedToTakeIds()),
     };
-    this.selectedToGiveIds.clear();
-    this.selectedToTakeIds.clear();
+
+    this.selectedToGiveIds.set(new Set());
+    this.selectedToTakeIds.set(new Set());
     this.proposalService.createProposal(payload);
   }
 }

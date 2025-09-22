@@ -1,16 +1,15 @@
 import { User } from '../models';
 import { AppStore } from '../store/app.store';
 import { inject, Injectable } from '@angular/core';
-import { StoreService } from './store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private store: any;
+  private store = inject(AppStore);
   private token: string = '';
 
-  constructor(private storeService: StoreService) {
+  constructor() {
     this.store = inject(AppStore);
   }
 
@@ -29,17 +28,13 @@ export class AuthService {
     return !!this.token;
   }
 
-  getUser() {
-    return this.store.getUser();
-  }
-
   getToken() {
     return localStorage.getItem('authToken');
   }
 
   loadUserRelatedData() {
-    if (!this.getUser().id) {
-      this.storeService.setUserFromSession(this.token);
+    if (!this.store.user()?.id) {
+      this.store.loadUserFromSession(this.token);
       this.setUserStore();
     } else {
       this.setUserStore();
@@ -47,8 +42,7 @@ export class AuthService {
   }
 
   private setUserStore() {
-    this.storeService.getAvailableCollections();
-    this.storeService.getUserCollections();
-    this.storeService.getAllCollections();
+    this.store.loadAllCollections( );
+    this.store.loadAvailableCollections();
   }
 }

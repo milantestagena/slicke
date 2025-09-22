@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { UserCollectionItem } from '../../models';
 
 @Component({
@@ -10,39 +10,51 @@ import { UserCollectionItem } from '../../models';
   styleUrls: ['./user-collection-item.component.scss'],
 })
 export class UserCollectionItemComponent {
-  @Input() item!: UserCollectionItem;
+  readonly item = input.required<UserCollectionItem>();
 
-  @Output() counterChanged = new EventEmitter<{
-    id: number;
-    counter: number;
-  }>();
-
-  get colorClass(): string {
-    if (this.item.counter === 0) return 'red';
-    if (this.item.counter === 1) return 'green';
+  private readonly counter = signal(0);
+  readonly colorClass = computed(() => {
+    const value = this.counter();
+    if (value === 0) {
+      return 'red';
+    }
+    if (value === 1) {
+      return 'green';
+    }
     return 'blue';
-  }
+  });
 
-  increment() {
-    this.item.counter++;
-    this.counterChanged.emit({
-      id: this.item.id,
-      counter: this.item.counter,
+  readonly counterChanged = output<{ id: number; counter: number }>();
+
+  constructor() {
+    effect(() => {
+      this.counter.set(this.item().counter);
     });
   }
 
+  increment() {
+    const next = this.counter() + 1;
+    this.counter.set(next);
+    this.counterChanged.emit({ id: this.item().id, counter: next });
+  }
+
   decrement() {
-    if (this.item.counter > 0) {
-      this.item.counter--;
-      this.counterChanged.emit({
-        id: this.item.id,
-        counter: this.item.counter,
-      });
+    const current = this.counter();
+    if (current <= 0) {
+      return;
     }
+
+    const next = current - 1;
+    this.counter.set(next);
+    this.counterChanged.emit({ id: this.item().id, counter: next });
   }
 
   onImgError(event: Event) {
     const imgElement = event.target as HTMLImageElement;
-    imgElement.src = 'images/noimage.png'; // Fallback image
+    imgElement.src = 'images/noimage.png';
+  }
+
+  get counterValue(): number {
+    return this.counter();
   }
 }

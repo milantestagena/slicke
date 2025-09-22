@@ -1,4 +1,4 @@
-<ng-container *ngIf="isLoggedIn; else login">
+<ng-container *ngIf="isLoggedIn(); else login">
   <div class="admin-layout">
     <app-admin-collections-sidebar
       (collectionSelected)="onCollectionSelected($event)"
@@ -11,6 +11,8 @@
       <app-dynamic-host></app-dynamic-host>
     </div>
   </div>
+
+  <app-notification />
 </ng-container>
 
 <ng-template #login>

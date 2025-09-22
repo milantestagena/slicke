@@ -8,7 +8,6 @@ import { NotificationService } from './notification.service';
 })
 export class HTTPService {
   private apiUrl = 'http://localhost:8000/api';
-  private notification = inject(NotificationService);
   constructor(private http: HttpClient) {}
 
   getRequest(requestUrl: string): Observable<any> {
@@ -57,45 +56,7 @@ export class HTTPService {
     return this.http.delete(`${this.apiUrl}/${requestUrl}`, { headers });
   }
 
-  requestWithNotification<T>(
-    method: 'get' | 'post' | 'put',
-    requestUrl: string,
-    withAuth: boolean = true,
-    data?: any,
-    successMessage?: string,
-    errorMessage?: string
-  ): Observable<T> {
-    let request;
-    if (withAuth) {
-      request =
-        method === 'get'
-          ? this.getRequestWithAuth(requestUrl)
-          : method === 'post'
-          ? this.postRequestWithAuth(requestUrl, data)
-          : this.putRequestWithAuth(requestUrl, data);
-    } else {
-      request =
-        method === 'get'
-          ? this.getRequest(requestUrl)
-          : method === 'post'
-          ? this.postRequest(requestUrl, data)
-          : this.putRequest(requestUrl, data);
-    }
 
-    return request.pipe(
-      tap({
-        next: () => {
-          this.notification.show(
-            'success',
-            successMessage || 'Request successful'
-          );
-        },
-        error: () => {
-          this.notification.show('error', errorMessage || 'An error occurred');
-        },
-      })
-    );
-  }
 
   sendMessage(message: string, recipientName: number): void {}
 }
