@@ -24,18 +24,25 @@ import { UserDetailsComponent } from '../user-details/user-details.component';
   ],
 })
 export class HomeComponent implements OnInit {
-  private readonly appStore = inject(AppStore);
+  private readonly store = inject(AppStore);
   private readonly authService = inject(AuthService);
 
-  readonly user = this.appStore.user;
-  readonly isLoggedIn = this.appStore.isAuthenticated;
+  readonly user = this.store.user;
+  readonly isLoggedIn = this.store.isAuthenticated;
 
   @ViewChild(DynamicHostComponent)
   dynamicHost!: DynamicHostComponent;
 
   ngOnInit(): void {
+    const token = this.authService.getToken();
     if (this.authService.isAuthenticated()) {
-      this.authService.loadUserRelatedData();
+
+    if (!this.store.user()?.id) {
+      this.store.loadUserFromSession(token as string);
+    }
+      this.store.loadAllCollections();
+      this.store.loadAvailableCollections();
+      this.store.loadUserCollections();
     }
   }
 

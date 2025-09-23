@@ -1,34 +1,32 @@
-<div class="collection-exchange" *ngIf="exchangeData() as data; else loading">
-  <div class="to-give">
-    <h2>Exchange with {{ data.otherUserName }}</h2>
-    <h3>Your duplicates</h3>
-    <div class="sticker-grid">
-      <app-exchange-item
-        *ngFor="let item of getToGiveItems()"
-        [item]="item.item"
-        [selected]="isSelectedToGive(item.item)"
-        (selectionChange)="onToggleToGive($event)"
-      />
+<div class="collection-exchange" *ngIf="exchangeData() as exchange">
+  <div *ngFor="let data of exchange; let i = index">
+    <div class="to-give">
+      <h2>Exchange with {{ data.otherUserName }}</h2>
+      <h3>Your duplicates</h3>
+      <div class="sticker-grid">
+        <app-exchange-item
+          *ngFor="let item of toGiveItems()[i]"
+          [item]="item.item"
+          [selected]="isSelectedToGive(i, item.item)"
+          (selectionChange)="onToggleToGive(i, $event)"
+        />
+      </div>
     </div>
-  </div>
 
-  <div class="to-take">
-    <h3>{{ data.otherUserName }} duplicates</h3>
-    <div class="sticker-grid">
-      <app-exchange-item
-        *ngFor="let item of getToTakeItems()"
-        [item]="item.item"
-        [selected]="isSelectedToTake(item.item)"
-        (selectionChange)="onToggleToTake($event)"
-      />
+    <div class="to-take">
+      <h3>{{ data.otherUserName }} duplicates</h3>
+      <div class="sticker-grid">
+        <app-exchange-item
+          *ngFor="let item of toTakeItems()[i]"
+          [item]="item.item"
+          [selected]="isSelectedToTake(i, item.item)"
+          (selectionChange)="onToggleToTake(i, $event)"
+        />
+      </div>
     </div>
-  </div>
-
-  <div class="submit">
-    <button (click)="submitExchange()">Submit Exchange</button>
+    <div class="submit">
+      <button (click)="submitExchange(i, data)">Submit Exchange</button>
+    </div>
   </div>
 </div>
 
-<ng-template #loading>
-  <p>Loading...</p>
-</ng-template>

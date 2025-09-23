@@ -19,7 +19,6 @@ export class LoginFormComponent {
 
   private readonly store = inject(AppStore);
   private readonly httpService = inject(HTTPService);
-  private readonly authService = inject(AuthService);
 
   onSubmit() {
     this.httpService
@@ -30,10 +29,11 @@ export class LoginFormComponent {
           if (!user) {
             throw new Error('Invalid credentials');
           }
-
           this.store.setUser(user);
           localStorage.setItem('authToken', response.data.token);
-          this.authService.loadUserRelatedData();
+          this.store.loadAllCollections();
+          this.store.loadAvailableCollections();
+          this.store.loadUserCollections();
         }),
         catchError(() => of({}))
       )

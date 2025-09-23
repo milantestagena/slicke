@@ -4,6 +4,7 @@ import { AvailableCollectionsFeature } from './features/available-collections.fe
 import { UserCollectionsFeature, PublicCollectionsFeature, MatchesFeature } from './features';
 import { CollectionsFeature } from './features/collections.feature';
 import { computed } from '@angular/core';
+import { ProposalsFeature } from './features/proposals.feature';
 
 
 export const AppStore = signalStore(
@@ -18,6 +19,7 @@ export const AppStore = signalStore(
   PublicCollectionsFeature,
   MatchesFeature,
   CollectionsFeature,
+  ProposalsFeature,
   withComputed(({ userCollections, availableCollections }) => ({
     availableNotOwned: computed(() => {
       const owned = new Set(userCollections().map(c => c.collection.id));

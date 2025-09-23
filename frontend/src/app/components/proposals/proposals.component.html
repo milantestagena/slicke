@@ -10,42 +10,39 @@
   </button>
 </div>
 
-<div *ngIf="loading">Loading proposals...</div>
-
 <!-- SENT -->
-<div *ngIf="!loading && activeTab === 'sent'" class="proposal-list">
+<div *ngIf="activeTab === 'sent'" class="proposal-list">
   <div *ngIf="formattedProposals.sent.length === 0">No sent proposals.</div>
   <div *ngFor="let proposal of formattedProposals.sent" class="proposal-card">
     <h4>To: {{ proposal.receiver.fullname }}</h4>
     <div class="items-block">
-  <div>
-    <strong>Offered:</strong>
-    <div class="item-row">
-      <app-proposal-item
-        *ngFor="let item of getOfferedItems(proposal)"
-        [identifier]="item.user_item.identifier"
-        [link]="item.user_item.link"
-      />
-    </div>
-  </div>
+      <div>
+        <strong>Offered:</strong>
+        <div class="item-row">
+          <app-proposal-item
+            *ngFor="let item of getOfferedItems(proposal)"
+            [identifier]="item.user_item.identifier"
+            [link]="item.user_item.link"
+          />
+        </div>
+      </div>
 
-  <div>
-    <strong>Requested:</strong>
-    <div class="item-row">
-      <app-proposal-item
-        *ngFor="let item of getRequestedItems(proposal)"
-        [identifier]="item.user_item.identifier"
-        [link]="item.user_item.link"
-      />
+      <div>
+        <strong>Requested:</strong>
+        <div class="item-row">
+          <app-proposal-item
+            *ngFor="let item of getRequestedItems(proposal)"
+            [identifier]="item.user_item.identifier"
+            [link]="item.user_item.link"
+          />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
   </div>
 </div>
 
 <!-- RECEIVED -->
-<div *ngIf="!loading && activeTab === 'received'" class="proposal-list">
+<div *ngIf="activeTab === 'received'" class="proposal-list">
   <div *ngIf="formattedProposals.received.length === 0">
     No received proposals.
   </div>
@@ -56,28 +53,28 @@
     <h4>From: {{ proposal.sender.fullname }}</h4>
 
     <div class="items-block">
-  <div>
-    <strong>Offered:</strong>
-    <div class="item-row">
-      <app-proposal-item
-        *ngFor="let item of getOfferedItems(proposal)"
-        [identifier]="item.user_item.identifier"
-        [link]="item.user_item.link"
-      />
-    </div>
-  </div>
+      <div>
+        <strong>Offered:</strong>
+        <div class="item-row">
+          <app-proposal-item
+            *ngFor="let item of getOfferedItems(proposal)"
+            [identifier]="item.user_item.identifier"
+            [link]="item.user_item.link"
+          />
+        </div>
+      </div>
 
-  <div>
-    <strong>Requested:</strong>
-    <div class="item-row">
-      <app-proposal-item
-        *ngFor="let item of getRequestedItems(proposal)"
-        [identifier]="item.user_item.identifier"
-        [link]="item.user_item.link"
-      />
+      <div>
+        <strong>Requested:</strong>
+        <div class="item-row">
+          <app-proposal-item
+            *ngFor="let item of getRequestedItems(proposal)"
+            [identifier]="item.user_item.identifier"
+            [link]="item.user_item.link"
+          />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <div class="actions">
       <button (click)="acceptProposal(proposal)">Accept</button>
@@ -85,4 +82,3 @@
     </div>
   </div>
 </div>
-

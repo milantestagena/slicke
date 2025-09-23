@@ -28,16 +28,4 @@ export class UserCollectionService {
   createUserCollection(id: number) {
     return this.http.postRequestWithAuth(`user_collection/${id}`, null);
   }
-
-  updateCollectionWithFeedback(id: number | string, data: any) {
-    this.updateUserCollection(id, data).subscribe({
-      next: () => {
-        this.notification.show('success', 'Collection updated successfully');
-      },
-      error: (err) => {
-        this.notification.show('error', 'Failed to update collection');
-        console.error(err);
-      },
-    });
-  }
 }

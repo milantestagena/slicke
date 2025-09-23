@@ -55,8 +55,4 @@ export class HTTPService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.delete(`${this.apiUrl}/${requestUrl}`, { headers });
   }
-
-
-
-  sendMessage(message: string, recipientName: number): void {}
 }

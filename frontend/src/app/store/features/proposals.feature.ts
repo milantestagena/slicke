@@ -1,4 +1,3 @@
-import { inject, Injector } from '@angular/core';
 import {
   signalStoreFeature,
   withState,
@@ -6,8 +5,11 @@ import {
   withHooks,
   patchState,
 } from '@ngrx/signals';
+import { inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Proposal } from '../../models/proposal.model';
 import { ProposalService } from '../../services/proposal.service';
+import { catchError, finalize, map, of, take, tap } from 'rxjs';
 
 export interface ProposalsState {
   proposals: Proposal[];
@@ -16,6 +18,7 @@ export interface ProposalsState {
 }
 
 let proposalsService: ProposalService;
+let destroyRef: DestroyRef;
 
 export const ProposalsFeature = signalStoreFeature(
   withState<ProposalsState>({
@@ -26,39 +29,84 @@ export const ProposalsFeature = signalStoreFeature(
 
   withHooks(() => ({
     onInit() {
-      const injector = inject(Injector);
       proposalsService = inject(ProposalService);
+      destroyRef = inject(DestroyRef);
     },
   })),
 
-  withMethods((store) => ({
-    loadProposals: (collectionId: number) => {
-      patchState(store, {
-        loading: true,
-        error: null,
-      });
-
-      proposalsService.getProposals(collectionId).subscribe({
-        next: (response) =>
-          patchState(store, {
-            proposals: response.data,
-            loading: false,
+  withMethods((store) => {
+    const reload = (collectionId: number) => {
+      patchState(store, { loading: true, error: null });
+      proposalsService
+        .getProposals(collectionId)
+        .pipe(
+          take(1),
+          map((r: any) => r?.data ?? []),
+          catchError(() => {
+            patchState(store, { error: 'Failed to load proposals' });
+            return of<Proposal[]>([]);
           }),
-        error: (err) =>
-          patchState(store, {
-            error: err.message || 'Failed to load proposals',
-            loading: false,
-          }),
-      });
-    },
+          finalize(() => patchState(store, { loading: false })),
+          takeUntilDestroyed(destroyRef)
+        )
+        .subscribe((list) => patchState(store, { proposals: list }));
+    };
 
-    clearProposals: () =>
-      patchState(store, {
-        proposals: [],
-        loading: false,
-        error: null,
-      }),
+    return {
+      loadProposals(collectionId: number) {
+        reload(collectionId);
+      },
 
-    getProposalCopy: () => [...store.proposals()],
-  }))
+      clearProposals() {
+        patchState(store, { proposals: [], loading: false, error: null });
+      },
+
+      getProposalCopy() {
+        return [...store.proposals()];
+      },
+
+      acceptProposal(proposalId: number, collectionIdToReload: number) {
+        proposalsService
+          .acceptProposal(proposalId)
+          .pipe(
+            take(1),
+            tap(() => reload(collectionIdToReload)),
+            catchError(() => of(null)),
+            takeUntilDestroyed(destroyRef)
+          )
+          .subscribe();
+      },
+
+      refuseProposal(proposalId: number, collectionIdToReload: number) {
+        proposalsService
+          .refuseProposal(proposalId)
+          .pipe(
+            take(1),
+            tap(() => reload(collectionIdToReload)),
+            catchError(() => of(null)),
+            takeUntilDestroyed(destroyRef)
+          )
+          .subscribe();
+      },
+
+      createProposal(payload: {
+        collection_id: number;
+        receiver_id: number;
+        offer: number[];
+        need: number[];
+      }) {
+        proposalsService
+          .createProposal(payload as any)
+          .pipe(
+            take(1),
+            tap(() => {
+              reload(payload.collection_id);
+            }),
+            catchError(() => of(null)),
+            takeUntilDestroyed(destroyRef)
+          )
+          .subscribe();
+      },
+    };
+  })
 );

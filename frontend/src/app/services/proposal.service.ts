@@ -1,5 +1,4 @@
 import { Injectable, inject } from '@angular/core';
-import { HTTPService } from './http.service';
 import { Proposal } from '../models/proposal.model';
 import { Observable } from 'rxjs';
 import { ValidResponse } from '../models/valid-response.model';
@@ -7,7 +6,6 @@ import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProposalService {
-  private http = inject(HTTPService);
   private notificationService = inject(NotificationService);
 
   createProposal(data: {
@@ -15,15 +13,15 @@ export class ProposalService {
     receiver_id: number;
     offer: number[];
     need: number[];
-  }): void {
-    this.notificationService.requestWithNotification<any>(
+  }): Observable<any> {
+    return this.notificationService.requestWithNotification<any>(
       'post',
       `create_proposal`,
       true,
       data,
       'Proposal created successfully',
       'Failed to create proposal'
-    ).subscribe();
+    );
   }
 
   acceptProposal(id: number): Observable<any> {
@@ -49,7 +47,9 @@ export class ProposalService {
   }
 
   getProposals(collectionId: number): Observable<ValidResponse<Proposal[]>> {
-    return this.notificationService.requestWithNotification<ValidResponse<Proposal[]>>(
+    return this.notificationService.requestWithNotification<
+      ValidResponse<Proposal[]>
+    >(
       'get',
       `get_proposals/${collectionId}`,
       true,

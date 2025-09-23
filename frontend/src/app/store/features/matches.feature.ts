@@ -12,7 +12,7 @@ import { catchError, map, of, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface MatchesState {
-  exchangeData: ExchangeData | null;
+  exchangeData: ExchangeData[] | null;
   loading: boolean;
   currentCollectionId: number | null;
 }
@@ -35,10 +35,17 @@ export const MatchesFeature = signalStoreFeature(
 
   withMethods((store) => ({
     loadExchangeForCollection(collectionId: number) {
+      patchState(store, { loading: true, currentCollectionId: collectionId });
       matchesService
         .getExchangeForCollection(collectionId)
         .pipe(
-          map((response: any) => response.data?.[0] ?? null),
+          map((response: any) => {
+            patchState(store, {
+              exchangeData: response.data as ExchangeData[],
+              loading: false,
+            });
+            return response.data as ExchangeData;
+          }),
           catchError((error) => {
             console.error('Error loading exchange data:', error);
             return of(null);

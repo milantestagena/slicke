@@ -31,18 +31,4 @@ export class AuthService {
   getToken() {
     return localStorage.getItem('authToken');
   }
-
-  loadUserRelatedData() {
-    if (!this.store.user()?.id) {
-      this.store.loadUserFromSession(this.token);
-      this.setUserStore();
-    } else {
-      this.setUserStore();
-    }
-  }
-
-  private setUserStore() {
-    this.store.loadAllCollections( );
-    this.store.loadAvailableCollections();
-  }
 }
