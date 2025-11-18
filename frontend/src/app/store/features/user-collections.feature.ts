@@ -13,14 +13,14 @@ import { UserCollectionService } from '../../services/user-collection.service';
 
 interface UserCollectionsState {
   userCollections: UserCollection[];
-  loading: boolean;
-  error: string | null;
+  userCollectionsLoading: boolean;
+  userCollectionsError: string | null;
 }
 
 const defaultUserCollectionsState = (): UserCollectionsState => ({
   userCollections: [],
-  loading: false,
-  error: null,
+  userCollectionsLoading: false,
+  userCollectionsError: null,
 });
 
 let destroyRef: DestroyRef;
@@ -39,17 +39,24 @@ export const UserCollectionsFeature = signalStoreFeature(
   withMethods((store) => {
     const resetState = () => patchState(store, defaultUserCollectionsState());
     const reload = () => {
-      patchState(store, { loading: true, error: null });
+      patchState(store, {
+        userCollectionsLoading: true,
+        userCollectionsError: null,
+      });
       userCollectionService
         .getUserCollections()
         .pipe(
           take(1),
           map((r: any) => r?.data ?? []),
           catchError(() => {
-            patchState(store, { error: 'load user collections failed' });
+            patchState(store, {
+              userCollectionsError: 'load user collections failed',
+            });
             return of<UserCollection[]>([]);
           }),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { userCollectionsLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe((list) => {

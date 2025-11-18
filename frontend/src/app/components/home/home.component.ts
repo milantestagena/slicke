@@ -24,7 +24,7 @@ import { UserDetailsComponent } from '../user-details/user-details.component';
   ],
 })
 export class HomeComponent implements OnInit {
-  private readonly store = inject(AppStore);
+  private store = inject(AppStore);
   private readonly authService = inject(AuthService);
 
   readonly isLoggedIn = this.store.isAuthenticated;

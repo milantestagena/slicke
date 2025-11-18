@@ -13,14 +13,14 @@ import { catchError, finalize, map, of, take } from 'rxjs';
 
 interface ConversationsState {
   Conversations: Conversation[];
-  loading: boolean;
-  error: string | null;
+  conversationsLoading: boolean;
+  conversationsError: string | null;
 }
 
 const defaultConversationsState = (): ConversationsState => ({
   Conversations: [],
-  loading: false,
-  error: null,
+  conversationsLoading: false,
+  conversationsError: null,
 });
 
 let messageService: MessageService;
@@ -48,8 +48,11 @@ export const ConversationsFeature = signalStoreFeature(
       return [...store.Conversations()];
     },
 
-    loadConversations() {
-      patchState(store, { loading: true, error: null });
+      loadConversations() {
+        patchState(store, {
+          conversationsLoading: true,
+          conversationsError: null,
+        });
 
       messageService
         .getConversations()
@@ -57,10 +60,14 @@ export const ConversationsFeature = signalStoreFeature(
           take(1),
           map((r: any) => (r?.data as Conversation[]) ?? []),
           catchError(() => {
-            patchState(store, { error: 'Failed to load conversations' });
+            patchState(store, {
+              conversationsError: 'Failed to load conversations',
+            });
             return of<Conversation[]>([]);
           }),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { conversationsLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe((list) => {

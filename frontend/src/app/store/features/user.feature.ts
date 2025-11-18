@@ -15,14 +15,14 @@ import { catchError, finalize, of } from 'rxjs';
 
 interface UserState {
   user: User | null;
-  loading: boolean;
-  error: string | null;
+  userLoading: boolean;
+  userError: string | null;
 }
 
 const defaultUserState = (): UserState => ({
   user: null,
-  loading: false,
-  error: null,
+  userLoading: false,
+  userError: null,
 });
 
 let http: HTTPService;
@@ -46,7 +46,7 @@ export const UserFeature = signalStoreFeature(
 
     return {
       setUser(user: User | null) {
-        patchState(store, { user, error: null });
+        patchState(store, { user, userError: null });
       },
 
       loadUserFromSession(token: string) {
@@ -55,13 +55,13 @@ export const UserFeature = signalStoreFeature(
           .pipe(
             takeUntilDestroyed(destroyRef),
             catchError(() => of({ data: null })),
-            finalize(() => patchState(store, { loading: false }))
+            finalize(() => patchState(store, { userLoading: false }))
           )
           .subscribe((response: any) => {
             if (response?.data) {
-              patchState(store, { user: response.data, error: null });
+              patchState(store, { user: response.data, userError: null });
             } else {
-              patchState(store, { user: null, error: 'unauthorized' });
+              patchState(store, { user: null, userError: 'unauthorized' });
             }
           });
       },

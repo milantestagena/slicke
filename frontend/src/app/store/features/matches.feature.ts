@@ -13,13 +13,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface MatchesState {
   exchangeData: ExchangeData[] | null;
-  loading: boolean;
+  matchesLoading: boolean;
   currentCollectionId: number | null;
 }
 
 const defaultMatchesState = (): MatchesState => ({
   exchangeData: null,
-  loading: false,
+  matchesLoading: false,
   currentCollectionId: null,
 });
 
@@ -40,14 +40,17 @@ export const MatchesFeature = signalStoreFeature(
 
     return {
       loadExchangeForCollection(collectionId: number) {
-        patchState(store, { loading: true, currentCollectionId: collectionId });
+        patchState(store, {
+          matchesLoading: true,
+          currentCollectionId: collectionId,
+        });
       matchesService
         .getExchangeForCollection(collectionId)
         .pipe(
           map((response: any) => {
             patchState(store, {
               exchangeData: response.data as ExchangeData[],
-              loading: false,
+              matchesLoading: false,
             });
             return response.data as ExchangeData;
           }),

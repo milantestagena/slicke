@@ -15,14 +15,14 @@ import { catchError, finalize, map, of, take, tap } from 'rxjs';
 
 interface CollectionsState {
   collections: Collection[];
-  loading: boolean;
-  error: string | null;
+  collectionsLoading: boolean;
+  collectionsError: string | null;
 }
 
 const defaultCollectionsState = (): CollectionsState => ({
   collections: [],
-  loading: false,
-  error: null,
+  collectionsLoading: false,
+  collectionsError: null,
 });
 
 let collectionService: CollectionService;
@@ -47,17 +47,22 @@ export const CollectionsFeature = signalStoreFeature(
   withMethods((store) => {
     const resetState = () => patchState(store, defaultCollectionsState());
     const reloadAll = () => {
-      patchState(store, { loading: true, error: null });
+      patchState(store, {
+        collectionsLoading: true,
+        collectionsError: null,
+      });
       collectionService
         .getAllCollections()
         .pipe(
           take(1),
           map((r: { data: Collection[] }) => r?.data ?? []),
           catchError(() => {
-            patchState(store, { error: 'loadAll failed' });
+            patchState(store, { collectionsError: 'loadAll failed' });
             return of<Collection[]>([]);
           }),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { collectionsLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe((list) => {

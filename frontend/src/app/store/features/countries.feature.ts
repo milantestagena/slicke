@@ -7,14 +7,14 @@ import { catchError, finalize, of, take } from 'rxjs';
 
 interface CountryState {
   Countries: Country[];
-  loading: boolean;
-  error: string | null;
+  countriesLoading: boolean;
+  countriesError: string | null;
 }
 
 const defaultCountryState = (): CountryState => ({
   Countries: [],
-  loading: false,
-  error: null,
+  countriesLoading: false,
+  countriesError: null,
 });
 
 let countryService: CountryService;
@@ -35,13 +35,18 @@ export const CountryFeature = signalStoreFeature(
   withMethods((store) => {
     const resetState = () => patchState(store, defaultCountryState());
     const load = () => {
-      patchState(store, { loading: true, error: null });
+      patchState(store, {
+        countriesLoading: true,
+        countriesError: null,
+      });
       countryService
         .getCountries()
         .pipe(
           take(1),
           catchError(() => of<Country[]>([])),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { countriesLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe(list => patchState(store, { Countries: list }));

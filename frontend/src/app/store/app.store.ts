@@ -35,19 +35,26 @@ export const AppStore = signalStore(
       return availableCollections().filter((c) => !owned.has(c.id as number));
     }),
   })),
-  withMethods((store) => ({
-    logout() {
-     store.resetAvailableCollections(),
-     store.resetCollections(),
-     store.resetConversationWithUser(),
-     store.resetConversations(),
-     store.resetCountries(),
-     store.resetMatches(),
-     store.resetMembership(),
-     store.resetProposals(),
-     store.resetPublicCollections(),
-     store.resetUser(),
-     store.resetUserCollections()
-    },
-  }))
+  withMethods((store) => {
+    const resetStore = () => {
+      store.resetAvailableCollections();
+      store.resetCollections();
+      store.resetConversationWithUser();
+      store.resetConversations();
+      store.resetCountries();
+      store.resetMatches();
+      store.resetMembership();
+      store.resetProposals();
+      store.resetPublicCollections();
+      store.resetUser();
+      store.resetUserCollections();
+    };
+
+    return {
+      resetStore,
+      logout() {
+        resetStore();
+      },
+    };
+  })
 );

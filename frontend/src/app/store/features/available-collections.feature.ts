@@ -13,14 +13,14 @@ import { take, map, catchError, of, finalize } from 'rxjs';
 
 type AvailableCollectionsState = {
   availableCollections: Collection[];
-  loading: boolean;
-  error: string | null;
+  availableCollectionsLoading: boolean;
+  availableCollectionsError: string | null;
 };
 
 const defaultAvailableCollectionsState = (): AvailableCollectionsState => ({
   availableCollections: [],
-  loading: false,
-  error: null,
+  availableCollectionsLoading: false,
+  availableCollectionsError: null,
 });
 
 let collectionService: CollectionService;
@@ -42,17 +42,24 @@ export const AvailableCollectionsFeature = signalStoreFeature(
         patchState(store, { availableCollections: AvailableCollections }),
       getAvailableCollections: () => [...store.availableCollections()],
       loadAvailableCollections() {
-        patchState(store, { loading: true, error: null });
+        patchState(store, {
+          availableCollectionsLoading: true,
+          availableCollectionsError: null,
+        });
         collectionService
           .getAvailableCollections()
           .pipe(
             take(1),
             map((r: any) => r?.data ?? []),
             catchError(() => {
-              patchState(store, { error: 'loadAvailable failed' });
+              patchState(store, {
+                availableCollectionsError: 'loadAvailable failed',
+              });
               return of<Collection[]>([]);
             }),
-            finalize(() => patchState(store, { loading: false })),
+            finalize(() =>
+              patchState(store, { availableCollectionsLoading: false })
+            ),
             takeUntilDestroyed(destroyRef)
           )
           .subscribe((items) => {

@@ -13,14 +13,14 @@ import { catchError, finalize, map, of, take, tap } from 'rxjs';
 
 export interface ProposalsState {
   proposals: Proposal[];
-  loading: boolean;
-  error: string | null;
+  proposalsLoading: boolean;
+  proposalsError: string | null;
 }
 
 const defaultProposalsState = (): ProposalsState => ({
   proposals: [],
-  loading: false,
-  error: null,
+  proposalsLoading: false,
+  proposalsError: null,
 });
 
 let proposalsService: ProposalService;
@@ -39,17 +39,24 @@ export const ProposalsFeature = signalStoreFeature(
   withMethods((store) => {
     const resetState = () => patchState(store, defaultProposalsState());
     const reload = (collectionId: number) => {
-      patchState(store, { loading: true, error: null });
+      patchState(store, {
+        proposalsLoading: true,
+        proposalsError: null,
+      });
       proposalsService
         .getProposals(collectionId)
         .pipe(
           take(1),
           map((r: any) => r?.data ?? []),
           catchError(() => {
-            patchState(store, { error: 'Failed to load proposals' });
+            patchState(store, {
+              proposalsError: 'Failed to load proposals',
+            });
             return of<Proposal[]>([]);
           }),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { proposalsLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe((list) => patchState(store, { proposals: list }));

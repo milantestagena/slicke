@@ -13,14 +13,14 @@ import { catchError, finalize, map, of, take, tap } from 'rxjs';
 
 interface ConversationWithUserState {
   ConversationWithUser: { [key: number]: ConversationWithUser };
-  loading: boolean;
-  error: string | null;
+  conversationWithUserLoading: boolean;
+  conversationWithUserError: string | null;
 }
 
 const defaultConversationWithUserState = (): ConversationWithUserState => ({
   ConversationWithUser: {},
-  loading: false,
-  error: null,
+  conversationWithUserLoading: false,
+  conversationWithUserError: null,
 });
 
 let messageService: MessageService;
@@ -40,7 +40,10 @@ export const ConversationWithUserFeature = signalStoreFeature(
     const resetState = () =>
       patchState(store, defaultConversationWithUserState());
     const reloadConversation = (correspondentId: number) => {
-      patchState(store, { loading: true, error: null });
+      patchState(store, {
+        conversationWithUserLoading: true,
+        conversationWithUserError: null,
+      });
 
       messageService
         .getConversationWithUser(correspondentId)
@@ -48,10 +51,14 @@ export const ConversationWithUserFeature = signalStoreFeature(
           take(1),
           map((r: any) => r?.data as ConversationWithUser),
           catchError(() => {
-            patchState(store, { error: 'Failed to load conversation' });
+            patchState(store, {
+              conversationWithUserError: 'Failed to load conversation',
+            });
             return of<ConversationWithUser | null>(null);
           }),
-          finalize(() => patchState(store, { loading: false })),
+          finalize(() =>
+            patchState(store, { conversationWithUserLoading: false })
+          ),
           takeUntilDestroyed(destroyRef)
         )
         .subscribe((conv) => {
