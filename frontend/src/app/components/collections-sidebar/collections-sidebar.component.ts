@@ -31,7 +31,6 @@ export class CollectionsSidebarComponent implements OnInit {
   }
 
   select(collection: UserCollection) {
-    this.store.loadUserCollections();
     this.collectionSelected.emit(collection);
   }
 

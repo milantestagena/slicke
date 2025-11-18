@@ -7,7 +7,11 @@
         <div (click)="toggle(collection)" class="collection-header">
           <span>{{ collection.collection.name }}</span>
         </div>
-        <ul *ngIf="openedCollection === collection" class="sub-listing">
+        <ul
+          *ngIf="openedCollection === collection"
+          class="sub-listing"
+          (click)="$event.stopPropagation()"
+        >
           <li (click)="select(collection)"><span>Collection</span></li>
           <li (click)="exchange(collection)"><span>Exchange</span></li>
           <li (click)="proposals(collection)"><span>Proposals</span></li>
