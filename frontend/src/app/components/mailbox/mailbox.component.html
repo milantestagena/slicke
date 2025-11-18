@@ -16,7 +16,8 @@
     </ul>
   </div>
 
-  <ng-container #formContainer></ng-container>
+
+  <ng-container *ngIf="isFormVisible()" #formContainer></ng-container>
 
   <div class="conversation">
     <div *ngIf="!isFormVisible() && activeConversation() as active">
@@ -36,7 +37,7 @@
       </div>
     </div>
 
-    <div *ngIf="!activeConversation()">
+    <div *ngIf="!isFormVisible() && !activeConversation()">
       <p>Select a user to view the conversation.</p>
     </div>
   </div>

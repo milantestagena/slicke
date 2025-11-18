@@ -17,15 +17,17 @@ interface ConversationsState {
   error: string | null;
 }
 
+const defaultConversationsState = (): ConversationsState => ({
+  Conversations: [],
+  loading: false,
+  error: null,
+});
+
 let messageService: MessageService;
 let destroyRef: DestroyRef;
 
 export const ConversationsFeature = signalStoreFeature(
-  withState<ConversationsState>({
-    Conversations: [],
-    loading: false,
-    error: null,
-  }),
+  withState<ConversationsState>(defaultConversationsState()),
 
   withHooks(() => ({
     onInit() {
@@ -34,10 +36,13 @@ export const ConversationsFeature = signalStoreFeature(
     },
   })),
 
-  withMethods((store) => ({
-    setConversations(conversations: Conversation[]) {
-      patchState(store, { Conversations: conversations });
-    },
+  withMethods((store) => {
+    const resetState = () => patchState(store, defaultConversationsState());
+
+    return {
+      setConversations(conversations: Conversation[]) {
+        patchState(store, { Conversations: conversations });
+      },
 
     getConversations() {
       return [...store.Conversations()];
@@ -62,5 +67,8 @@ export const ConversationsFeature = signalStoreFeature(
           patchState(store, { Conversations: list });
         });
     },
-  }))
+
+      resetConversations: resetState,
+    };
+  })
 );

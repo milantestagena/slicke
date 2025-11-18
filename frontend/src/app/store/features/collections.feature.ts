@@ -19,16 +19,18 @@ interface CollectionsState {
   error: string | null;
 }
 
+const defaultCollectionsState = (): CollectionsState => ({
+  collections: [],
+  loading: false,
+  error: null,
+});
+
 let collectionService: CollectionService;
 let notificationService: NotificationService;
 let destroyRef: DestroyRef;
 
 export const CollectionsFeature = signalStoreFeature(
-  withState<CollectionsState>({
-    collections: [],
-    loading: false,
-    error: null,
-  }),
+  withState<CollectionsState>(defaultCollectionsState()),
 
   withHooks(() => ({
     onInit() {
@@ -43,6 +45,7 @@ export const CollectionsFeature = signalStoreFeature(
   })),
 
   withMethods((store) => {
+    const resetState = () => patchState(store, defaultCollectionsState());
     const reloadAll = () => {
       patchState(store, { loading: true, error: null });
       collectionService
@@ -101,6 +104,8 @@ export const CollectionsFeature = signalStoreFeature(
           )
           .subscribe();
       },
+
+      resetCollections: resetState,
     };
   })
 );

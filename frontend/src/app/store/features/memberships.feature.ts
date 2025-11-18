@@ -11,13 +11,26 @@ import { HTTPService } from '../../services/http.service';
 import { GetUrls } from '../../enums';
 import { map, take } from 'rxjs';
 
+interface MembershipState {
+  MembershipPackages: Membership[];
+}
+
+const defaultMembershipState = (): MembershipState => ({
+  MembershipPackages: [],
+});
+
 export const MembershipFeature = signalStoreFeature(
-  withState<{ MembershipPackages: Membership[]  }>({ MembershipPackages: [] }),
-  withMethods((store) => ({
-    setMembershipPackages: (MembershipPackages: Membership[]) =>
-      patchState(store, { MembershipPackages: MembershipPackages }),
-    getMembershipPackages: () => ({ ...store.MembershipPackages() })
-  })),
+  withState<MembershipState>(defaultMembershipState()),
+  withMethods((store) => {
+    const resetState = () => patchState(store, defaultMembershipState());
+
+    return {
+      setMembershipPackages: (MembershipPackages: Membership[]) =>
+        patchState(store, { MembershipPackages: MembershipPackages }),
+      getMembershipPackages: () => ({ ...store.MembershipPackages() }),
+      resetMembership: resetState,
+    };
+  }),
   withHooks((store) => ({
     onInit() {
       const injector = inject(Injector);
@@ -34,5 +47,5 @@ export const MembershipFeature = signalStoreFeature(
           .subscribe();
       });
     },
-  })),
+  }))
 );

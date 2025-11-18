@@ -6,14 +6,28 @@ import {
 } from '@ngrx/signals';
 import { Collection } from '../../models';
 
+interface PublicCollectionsState {
+  publicCollections: Collection[];
+}
+
+const defaultPublicCollectionsState = (): PublicCollectionsState => ({
+  publicCollections: [],
+});
+
 export const PublicCollectionsFeature = signalStoreFeature(
-  withState<{ publicCollections: Collection[] }>({ publicCollections: [] }),
-  withMethods((store) => ({
-    setPublicCollections: (collections: Collection[]) =>
-      patchState(store, { publicCollections: collections }),
+  withState<PublicCollectionsState>(defaultPublicCollectionsState()),
+  withMethods((store) => {
+    const resetState = () => patchState(store, defaultPublicCollectionsState());
 
-    getPublicCollections: () => [...store.publicCollections()],
+    return {
+      setPublicCollections: (collections: Collection[]) =>
+        patchState(store, { publicCollections: collections }),
 
-    clearPublicCollections: () => patchState(store, { publicCollections: [] }),
-  }))
+      getPublicCollections: () => [...store.publicCollections()],
+
+      clearPublicCollections: resetState,
+
+      resetPublicCollections: resetState,
+    };
+  })
 );

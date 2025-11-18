@@ -24,7 +24,15 @@ import { MessageService } from '../../services/message.service';
 })
 export class MailboxComponent implements OnInit {
   @ViewChild('formContainer', { read: ViewContainerRef })
-  formContainer!: ViewContainerRef;
+  set formContainer(container: ViewContainerRef | undefined) {
+    this.formContainerRef = container ?? null;
+    if (this.formContainerRef && this.shouldRenderForm) {
+      this.renderCreateMailForm();
+    }
+  }
+
+  private formContainerRef: ViewContainerRef | null = null;
+  private shouldRenderForm = false;
 
   private readonly store = inject(AppStore);
   private readonly messageService = inject(MessageService);
@@ -62,6 +70,8 @@ export class MailboxComponent implements OnInit {
 
   selectUser(conversation: Conversation) {
     this.isFormVisible.set(false);
+    this.shouldRenderForm = false;
+    this.formContainerRef?.clear();
     const currentUserId = this.userSignal()?.id;
     if (!currentUserId) {
       return;
@@ -84,9 +94,20 @@ export class MailboxComponent implements OnInit {
 
   showCreateMailForm(event: MouseEvent) {
     event.preventDefault();
-    this.formContainer.clear();
+    this.shouldRenderForm = true;
     this.isFormVisible.set(true);
-    this.createMessageFormRef = this.formContainer.createComponent(
+    if (this.formContainerRef) {
+      this.renderCreateMailForm();
+    }
+  }
+
+  private renderCreateMailForm() {
+    if (!this.formContainerRef) {
+      return;
+    }
+
+    this.formContainerRef.clear();
+    this.createMessageFormRef = this.formContainerRef.createComponent(
       CreateMessageFormComponent
     );
 
@@ -94,8 +115,9 @@ export class MailboxComponent implements OnInit {
       .pipe(take(1))
       .subscribe((data) => {
         this.messageService.sendMessage(data.message, data.recipient);
-        this.formContainer.clear();
+        this.formContainerRef?.clear();
         this.isFormVisible.set(false);
+        this.shouldRenderForm = false;
         this.correspondentId.set(0);
       });
   }

@@ -17,15 +17,17 @@ interface ConversationWithUserState {
   error: string | null;
 }
 
+const defaultConversationWithUserState = (): ConversationWithUserState => ({
+  ConversationWithUser: {},
+  loading: false,
+  error: null,
+});
+
 let messageService: MessageService;
 let destroyRef: DestroyRef;
 
 export const ConversationWithUserFeature = signalStoreFeature(
-  withState<ConversationWithUserState>({
-    ConversationWithUser: {},
-    loading: false,
-    error: null,
-  }),
+  withState<ConversationWithUserState>(defaultConversationWithUserState()),
 
   withHooks(() => ({
     onInit() {
@@ -35,6 +37,8 @@ export const ConversationWithUserFeature = signalStoreFeature(
   })),
 
   withMethods((store) => {
+    const resetState = () =>
+      patchState(store, defaultConversationWithUserState());
     const reloadConversation = (correspondentId: number) => {
       patchState(store, { loading: true, error: null });
 
@@ -106,6 +110,8 @@ export const ConversationWithUserFeature = signalStoreFeature(
           )
           .subscribe();
       },
+
+      resetConversationWithUser: resetState,
     };
   })
 );

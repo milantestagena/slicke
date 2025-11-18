@@ -17,15 +17,17 @@ interface UserCollectionsState {
   error: string | null;
 }
 
+const defaultUserCollectionsState = (): UserCollectionsState => ({
+  userCollections: [],
+  loading: false,
+  error: null,
+});
+
 let destroyRef: DestroyRef;
 let userCollectionService: UserCollectionService;
 
 export const UserCollectionsFeature = signalStoreFeature(
-  withState<UserCollectionsState>({
-    userCollections: [],
-    loading: false,
-    error: null,
-  }),
+  withState<UserCollectionsState>(defaultUserCollectionsState()),
 
   withHooks(() => ({
     onInit() {
@@ -35,6 +37,7 @@ export const UserCollectionsFeature = signalStoreFeature(
   })),
 
   withMethods((store) => {
+    const resetState = () => patchState(store, defaultUserCollectionsState());
     const reload = () => {
       patchState(store, { loading: true, error: null });
       userCollectionService
@@ -109,7 +112,7 @@ export const UserCollectionsFeature = signalStoreFeature(
 
       // clear
       clearUserCollections() {
-        patchState(store, { userCollections: [] });
+        resetState();
       },
 
       // API fetch (ekvivalent tvog starog servisa)
@@ -131,6 +134,8 @@ export const UserCollectionsFeature = signalStoreFeature(
           )
           .subscribe();
       },
+
+      resetUserCollections: resetState,
     };
   })
 );

@@ -19,15 +19,17 @@ interface UserState {
   error: string | null;
 }
 
+const defaultUserState = (): UserState => ({
+  user: null,
+  loading: false,
+  error: null,
+});
+
 let http: HTTPService;
 let destroyRef: DestroyRef;
 
 export const UserFeature = signalStoreFeature(
-  withState<UserState>({
-    user: null,
-    loading: false,
-    error: null,
-  }),
+  withState<UserState>(defaultUserState()),
   withHooks(() => ({
     onInit() {
       http = inject(HTTPService);
@@ -39,30 +41,31 @@ export const UserFeature = signalStoreFeature(
     isAuthenticated: computed(() => !!user()),
   })),
 
-  withMethods((store) => ({
-    setUser(user: User | null) {
-      patchState(store, { user, error: null });
-    },
+  withMethods((store) => {
+    const resetState = () => patchState(store, defaultUserState());
 
-    loadUserFromSession(token: string) {
-      http
-        .getRequestWithAuth(GetUrls.GET_USER_FOR_SESSION, { token })
-        .pipe(
-          takeUntilDestroyed(destroyRef),
-          catchError(() => of({ data: null })),
-          finalize(() => patchState(store, { loading: false }))
-        )
-        .subscribe((response: any) => {
-          if (response?.data) {
-            patchState(store, { user: response.data, error: null });
-          } else {
-            patchState(store, { user: null, error: 'unauthorized' });
-          }
-        });
-    },
+    return {
+      setUser(user: User | null) {
+        patchState(store, { user, error: null });
+      },
 
-    logout() {
-      patchState(store, { user: null, error: null });
-    },
-  }))
+      loadUserFromSession(token: string) {
+        http
+          .getRequestWithAuth(GetUrls.GET_USER_FOR_SESSION, { token })
+          .pipe(
+            takeUntilDestroyed(destroyRef),
+            catchError(() => of({ data: null })),
+            finalize(() => patchState(store, { loading: false }))
+          )
+          .subscribe((response: any) => {
+            if (response?.data) {
+              patchState(store, { user: response.data, error: null });
+            } else {
+              patchState(store, { user: null, error: 'unauthorized' });
+            }
+          });
+      },
+      resetUser: resetState,
+    };
+  })
 );

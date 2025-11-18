@@ -11,11 +11,17 @@ interface CountryState {
   error: string | null;
 }
 
+const defaultCountryState = (): CountryState => ({
+  Countries: [],
+  loading: false,
+  error: null,
+});
+
 let countryService: CountryService;
 let destroyRef: DestroyRef;
 
 export const CountryFeature = signalStoreFeature(
-  withState<CountryState>({ Countries: [], loading: false, error: null }),
+  withState<CountryState>(defaultCountryState()),
 
   withHooks(() => ({
     onInit() {
@@ -27,6 +33,7 @@ export const CountryFeature = signalStoreFeature(
   })),
 
   withMethods((store) => {
+    const resetState = () => patchState(store, defaultCountryState());
     const load = () => {
       patchState(store, { loading: true, error: null });
       countryService
@@ -48,6 +55,7 @@ export const CountryFeature = signalStoreFeature(
         return store.Countries();
       },
       loadCountries: load,
+      resetCountries: resetState,
     };
 
     return methods;

@@ -17,15 +17,17 @@ export interface ProposalsState {
   error: string | null;
 }
 
+const defaultProposalsState = (): ProposalsState => ({
+  proposals: [],
+  loading: false,
+  error: null,
+});
+
 let proposalsService: ProposalService;
 let destroyRef: DestroyRef;
 
 export const ProposalsFeature = signalStoreFeature(
-  withState<ProposalsState>({
-    proposals: [],
-    loading: false,
-    error: null,
-  }),
+  withState<ProposalsState>(defaultProposalsState()),
 
   withHooks(() => ({
     onInit() {
@@ -35,6 +37,7 @@ export const ProposalsFeature = signalStoreFeature(
   })),
 
   withMethods((store) => {
+    const resetState = () => patchState(store, defaultProposalsState());
     const reload = (collectionId: number) => {
       patchState(store, { loading: true, error: null });
       proposalsService
@@ -58,7 +61,7 @@ export const ProposalsFeature = signalStoreFeature(
       },
 
       clearProposals() {
-        patchState(store, { proposals: [], loading: false, error: null });
+        resetState();
       },
 
       getProposalCopy() {
@@ -107,6 +110,8 @@ export const ProposalsFeature = signalStoreFeature(
           )
           .subscribe();
       },
+
+      resetProposals: resetState,
     };
   })
 );

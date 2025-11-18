@@ -17,14 +17,16 @@ export interface MatchesState {
   currentCollectionId: number | null;
 }
 
+const defaultMatchesState = (): MatchesState => ({
+  exchangeData: null,
+  loading: false,
+  currentCollectionId: null,
+});
+
 let matchesService: MatchesService;
 let destroyRef: DestroyRef;
 export const MatchesFeature = signalStoreFeature(
-  withState<MatchesState>({
-    exchangeData: null,
-    loading: false,
-    currentCollectionId: null,
-  }),
+  withState<MatchesState>(defaultMatchesState()),
 
   withHooks(() => ({
     onInit() {
@@ -33,9 +35,12 @@ export const MatchesFeature = signalStoreFeature(
     },
   })),
 
-  withMethods((store) => ({
-    loadExchangeForCollection(collectionId: number) {
-      patchState(store, { loading: true, currentCollectionId: collectionId });
+  withMethods((store) => {
+    const resetState = () => patchState(store, defaultMatchesState());
+
+    return {
+      loadExchangeForCollection(collectionId: number) {
+        patchState(store, { loading: true, currentCollectionId: collectionId });
       matchesService
         .getExchangeForCollection(collectionId)
         .pipe(
@@ -56,13 +61,11 @@ export const MatchesFeature = signalStoreFeature(
         .subscribe();
     },
 
-    clearExchange: () =>
-      patchState(store, {
-        exchangeData: null,
-        currentCollectionId: null,
-        loading: false,
-      }),
+      clearExchange: resetState,
 
-    getExchangeCopy: () => ({ ...store.exchangeData() }),
-  }))
+      getExchangeCopy: () => ({ ...store.exchangeData() }),
+
+      resetMatches: resetState,
+    };
+  })
 );

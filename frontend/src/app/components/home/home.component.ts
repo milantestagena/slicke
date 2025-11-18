@@ -27,7 +27,6 @@ export class HomeComponent implements OnInit {
   private readonly store = inject(AppStore);
   private readonly authService = inject(AuthService);
 
-  readonly user = this.store.user;
   readonly isLoggedIn = this.store.isAuthenticated;
 
   @ViewChild(DynamicHostComponent)
@@ -35,15 +34,15 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     const token = this.authService.getToken();
-    if (this.authService.isAuthenticated()) {
+    if (token && this.authService.isAuthenticated()) {
 
-    if (!this.store.user()?.id) {
-      this.store.loadUserFromSession(token as string);
-    }
-      this.store.loadAllCollections();
-      this.store.loadAvailableCollections();
-      this.store.loadUserCollections();
-    }
+      if (!this.store.user()?.id) {
+        this.store.loadUserFromSession(token);
+      }
+        this.store.loadAllCollections();
+        this.store.loadAvailableCollections();
+        this.store.loadUserCollections();
+      }
   }
 
   onCollectionSelected(collection: UserCollection) {
