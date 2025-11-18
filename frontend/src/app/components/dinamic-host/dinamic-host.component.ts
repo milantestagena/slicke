@@ -14,7 +14,7 @@ import { Collection, UserCollection } from '../../models';
   selector: 'app-dynamic-host',
   standalone: true,
   imports: [CommonModule],
-  template: ` <ng-template #container></ng-template> `,
+  template: `<ng-template #container></ng-template>`,
 })
 export class DynamicHostComponent {
   @ViewChild('container', { read: ViewContainerRef })
@@ -25,12 +25,20 @@ export class DynamicHostComponent {
 
   private async loadComponent<T>(
     resolver: () => Promise<Type<T>>,
+    inputs?: Record<string, unknown>
   ): Promise<ComponentRef<T>> {
     this.container.clear();
     this.currentComponent?.destroy();
 
     const componentType = await resolver();
     const componentRef = this.container.createComponent(componentType);
+
+    if (inputs) {
+      Object.entries(inputs).forEach(([key, value]) => {
+        componentRef.setInput(key, value as never);
+      });
+    }
+
     this.destroyRef.onDestroy(() => componentRef.destroy());
     this.currentComponent = componentRef;
     return componentRef;
@@ -38,61 +46,65 @@ export class DynamicHostComponent {
 
   async loadMailbox() {
     await this.loadComponent(() =>
-      import('../mailbox/mailbox.component').then((m) => m.MailboxComponent),
+      import('../mailbox/mailbox.component').then((m) => m.MailboxComponent)
     );
   }
 
   async loadUserCollection(collection: UserCollection) {
-    const componentRef = await this.loadComponent(() =>
-      import('../collection-detail/collection-detail.component').then(
-        (m) => m.CollectionDetailComponent,
-      ),
+    await this.loadComponent(
+      () =>
+        import('../collection-detail/collection-detail.component').then(
+          (m) => m.CollectionDetailComponent
+        ),
+      { collection }
     );
-    componentRef.instance.collection = collection;
   }
 
   async loadAddToCollectionComponent() {
     await this.loadComponent(() =>
       import('../add-to-collection/add-to-collection.component').then(
-        (m) => m.AddToCollectionComponent,
-      ),
+        (m) => m.AddToCollectionComponent
+      )
     );
   }
 
   async loadExchange(collection: UserCollection) {
-    const componentRef = await this.loadComponent(() =>
-      import('../collection-exchange/collection-exchange.component').then(
-        (m) => m.CollectionExchangeComponent,
-      ),
+    await this.loadComponent(
+      () =>
+        import('../collection-exchange/collection-exchange.component').then(
+          (m) => m.CollectionExchangeComponent
+        ),
+      { collection }
     );
-    componentRef.instance.collection = collection;
   }
 
   async loadProposals(collection: UserCollection) {
-    const componentRef = await this.loadComponent(() =>
-      import('../proposals/proposals.component').then(
-        (m) => m.ProposalsComponent,
-      ),
+    await this.loadComponent(
+      () =>
+        import('../proposals/proposals.component').then(
+          (m) => m.ProposalsComponent
+        ),
+      { userCollection: collection }
     );
-    componentRef.setInput("userCollection", collection);
   }
 
   async loadCollection(collection: Collection) {
-    const componentRef = await this.loadComponent(() =>
-      import('../admin/collection-form-component/collection-form-component.component').then(
-        (m) => m.CollectionFormComponentComponent,
-      ),
+    await this.loadComponent(
+      () =>
+        import(
+          '../admin/collection-form-component/collection-form-component.component'
+        ).then((m) => m.CollectionFormComponentComponent),
+      { mode: 'edit', collection }
     );
-    componentRef.instance.mode = 'edit';
-    componentRef.instance.collection = collection;
   }
 
   async createCollection() {
-    const componentRef = await this.loadComponent(() =>
-      import('../admin/collection-form-component/collection-form-component.component').then(
-        (m) => m.CollectionFormComponentComponent,
-      ),
+    await this.loadComponent(
+      () =>
+        import(
+          '../admin/collection-form-component/collection-form-component.component'
+        ).then((m) => m.CollectionFormComponentComponent),
+      { mode: 'create' }
     );
-    componentRef.instance.mode = 'create';
   }
 }

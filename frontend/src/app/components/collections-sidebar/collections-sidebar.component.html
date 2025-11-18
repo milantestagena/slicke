@@ -1,18 +1,21 @@
-<div class="collections-sidebar">
-  <h3>Collections:</h3>
-  <ul>
-    <li *ngFor="let collection of collections()">
-      <div (click)="toggle(collection)" class="collection-header">
-        <span>{{ collection.collection.name }}</span>
-      </div>
-      <ul *ngIf="openedCollection === collection" class="sub-listing">
-        <li (click)="select(collection)"><span>Collection</span></li>
-        <li (click)="exchange(collection)"><span>Exchange</span></li>
-        <li (click)="proposals(collection)"><span>Proposals</span></li>
-      </ul>
-    </li>
-  </ul>
-</div>
-<div class="action-bar">
-  <button (click)="addToCollection()">Add to collection</button>
-</div>
+
+<ng-container *ngIf="userIsLogged()">
+  <div class="collections-sidebar">
+    <h3>Collections:</h3>
+    <ul>
+      <li *ngFor="let collection of collections()">
+        <div (click)="toggle(collection)" class="collection-header">
+          <span>{{ collection.collection.name }}</span>
+        </div>
+        <ul *ngIf="openedCollection === collection" class="sub-listing">
+          <li (click)="select(collection)"><span>Collection</span></li>
+          <li (click)="exchange(collection)"><span>Exchange</span></li>
+          <li (click)="proposals(collection)"><span>Proposals</span></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <div class="action-bar">
+    <button (click)="addToCollection()">Add to collection</button>
+  </div>
+</ng-container>

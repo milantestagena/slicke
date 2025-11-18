@@ -21,10 +21,12 @@ export class CollectionsSidebarComponent implements OnInit {
   @Output() exchangeSelected = new EventEmitter<UserCollection>();
   @Output() proposalsSelected = new EventEmitter<UserCollection>();
 
+  public  userIsLogged!: Signal<boolean>;
   public collections!: Signal<UserCollection[]>;
 
   ngOnInit(): void {
     this.store.loadUserCollections();
+    this.userIsLogged = this.store.isAuthenticated;
     this.collections = this.store.userCollections;
   }
 
